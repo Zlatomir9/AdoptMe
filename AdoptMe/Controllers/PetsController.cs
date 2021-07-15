@@ -11,6 +11,26 @@
     {
         private readonly AdoptMeDbContext data;
 
+        public IActionResult All(AllPetsViewModel query)
+        {
+            var petsQuery = this.data.Pets
+                .Select(x => new PetListingViewModel
+                {
+                    Id = x.Id,
+                    Species = x.Species.ToString(),
+                    Breed = x.Breed,
+                    ImageUrl = x.ImageUrl,
+                    Name = x.Name,
+                    Age = x.Age,
+                    Gender = x.Gender.ToString()
+                })
+                .ToList();
+
+            query.Pets = petsQuery;
+
+            return View(query);
+        }
+
         public PetsController(AdoptMeDbContext data)
         {
             this.data = data;

@@ -13,7 +13,14 @@
 
         public IActionResult All(AllPetsViewModel query)
         {
-            var petsQuery = this.data.Pets
+            var petsQuery = this.data.Pets.AsQueryable();
+
+            if (!string.IsNullOrEmpty(query.Species))
+            {
+                petsQuery = petsQuery.Where(s => s.Species.Name == query.Species);
+            }
+
+            var pets = petsQuery
                 .Select(x => new PetListingViewModel
                 {
                     Id = x.Id,
@@ -26,7 +33,13 @@
                 })
                 .ToList();
 
-            query.Pets = petsQuery;
+            var species = this.data.Species
+                .Select(s => s.Name)
+                .Distinct()
+                .ToList();
+
+            query.AllSpecies = species;
+            query.Pets = pets;
 
             return View(query);
         }
@@ -71,7 +84,7 @@
             this.data.Pets.Add(currentPet);
             this.data.SaveChanges();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("All", "Pets");
         }
 
         private IEnumerable<PetSpeciesViewModel> GetPetSpecies()

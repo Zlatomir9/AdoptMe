@@ -35,6 +35,10 @@
         [Required]
         public int SpeciesId { get; set; }
 
-        public Species Species { get; init; }       
+        public Species Species { get; init; }
+
+        public int ShelterId { get; init; }
+
+        public Shelter Shelter { get; init; }
     }
 }

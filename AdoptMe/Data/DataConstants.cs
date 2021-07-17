@@ -8,5 +8,7 @@
         public const int PetStoryMaxLength = 5000;
         public const int PetAgeMinValue = 0;
         public const int PetAgeMaxValue = 18;
+
+        public const int ShleterNameMaxLength = 30;
     }
 }

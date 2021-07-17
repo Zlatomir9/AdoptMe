@@ -54,6 +54,7 @@ namespace AdoptMe
             app.UseHttpsRedirection()
                .UseStaticFiles()
                .UseRouting()
+               .UseAuthentication()
                .UseAuthorization()
                .UseEndpoints(endpoints =>
                {

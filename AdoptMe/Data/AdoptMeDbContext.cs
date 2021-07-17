@@ -1,9 +1,10 @@
 ﻿namespace AdoptMe.Data
 {
     using AdoptMe.Data.Models;
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore;
 
-    public class AdoptMeDbContext : DbContext
+    public class AdoptMeDbContext : IdentityDbContext
     {
         public AdoptMeDbContext(DbContextOptions<AdoptMeDbContext> options)
             : base(options)

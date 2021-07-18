@@ -4,15 +4,15 @@
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
-    using static Data.DataConstants;
+    using static Data.DataConstants.PetRequirements;
 
     public class AddPetFormModel
     {
         [Required]
-        [StringLength(PetNameMaxLength, MinimumLength = PetNameMinLength)]
+        [StringLength(NameMaxLength, MinimumLength = NameMinLength)]
         public string Name { get; init; }
 
-        [Range(PetAgeMinValue, PetAgeMaxValue)]
+        [Range(AgeMinValue, AgeMaxValue)]
         public int Age { get; init; }
 
         public Gender Gender { get; init; }
@@ -24,7 +24,7 @@
         public string Color { get; init; }
 
         [Required]
-        [StringLength(PetStoryMaxLength, MinimumLength = PetStoryMinLength)]
+        [StringLength(StoryMaxLength, MinimumLength = StoryMinLength)]
         public string MyStory { get; init; }
 
         [Display(Name = "Image URL")]

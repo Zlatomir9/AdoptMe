@@ -3,14 +3,14 @@
     using AdoptMe.Data.Models.Enums;
     using System.ComponentModel.DataAnnotations;
 
-    using static DataConstants;
+    using static DataConstants.PetRequirements;
     
     public class Pet
     {
         public int Id { get; init; }
 
         [Required]
-        [MaxLength(PetNameMaxLength)]
+        [MaxLength(NameMaxLength)]
         public string Name { get; set; }
 
         public int Age { get; set; }
@@ -24,7 +24,7 @@
         public string Color { get; set; }
 
         [Required]
-        [MaxLength(PetStoryMaxLength)]
+        [MaxLength(StoryMaxLength)]
         public string MyStory { get; set; }
 
         [Required]

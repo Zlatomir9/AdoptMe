@@ -3,17 +3,18 @@
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
-    using static DataConstants;
+    using static DataConstants.ShelterRequirements;
 
     public class Shelter
     {
         public int Id { get; init; }
 
         [Required]
-        [MaxLength(ShleterNameMaxLength)]
+        [MaxLength(NameMaxLength)]
         public string Name { get; set; }
         
         [Required]
+        [MaxLength(PhoneMaxLength)]
         public string PhoneNumber { get; set; }
 
         [Required]

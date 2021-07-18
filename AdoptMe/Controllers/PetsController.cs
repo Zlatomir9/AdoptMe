@@ -2,7 +2,9 @@
 {
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
+    using AdoptMe.Infrastructure;
     using AdoptMe.Models.Pets;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Collections.Generic;
     using System.Linq;
@@ -10,6 +12,11 @@
     public class PetsController : Controller
     {
         private readonly AdoptMeDbContext data;
+
+        public PetsController(AdoptMeDbContext data)
+        {
+            this.data = data;
+        }
 
         public IActionResult All(AllPetsViewModel query)
         {
@@ -42,21 +49,31 @@
             query.Pets = pets;
 
             return View(query);
-        }
+        }        
 
-        public PetsController(AdoptMeDbContext data)
+        [Authorize]
+        public IActionResult Add() 
         {
-            this.data = data;
-        }
+            if (!this.UserIsShelter())
+            {
+                return RedirectToAction(nameof(SheltersController.Create), "Shelters");
+            }
 
-        public IActionResult Add() => View(new AddPetFormModel 
-        {
-            Species = this.GetPetSpecies()
-        });
+            return View(new AddPetFormModel
+            {
+                Species = this.GetPetSpecies()
+            });
+        }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Add(AddPetFormModel pet)
         {
+            if(!this.UserIsShelter())
+            {
+                return RedirectToAction(nameof(SheltersController.Create), "Shelters");
+            }
+
             if (!this.data.Species.Any(s => s.Id == pet.SpeciesId))
             {
                 this.ModelState.AddModelError(nameof(pet.SpeciesId), "Species does not exist.");
@@ -86,6 +103,11 @@
 
             return RedirectToAction("All", "Pets");
         }
+
+        private bool UserIsShelter()
+            => this.data
+                .Shelters
+                .Any(s => s.UserId == this.User.GetId());
 
         private IEnumerable<PetSpeciesViewModel> GetPetSpecies()
             => this.data.Species

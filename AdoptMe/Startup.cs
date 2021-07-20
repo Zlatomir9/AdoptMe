@@ -2,6 +2,7 @@ namespace AdoptMe
 {
     using AdoptMe.Data;
     using AdoptMe.Infrastructure;
+    using AdoptMe.Services.Pets;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
@@ -35,6 +36,8 @@ namespace AdoptMe
 
             services
                 .AddControllersWithViews();
+
+            services.AddTransient<IPetService, PetService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -13,5 +13,8 @@
         [Required]
         [StringLength(PhoneMaxLength, MinimumLength = PhoneMinLength)]
         public string PhoneNumber { get; set; }
+
+        [Required]
+        public string Email { get; set; }
     }
 }

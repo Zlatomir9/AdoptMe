@@ -1,8 +1,47 @@
-﻿@{
+﻿@model IndexViewModel
+
+@{
     ViewBag.Title = "AdoptMe";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h4 class="display-4">Welcome to the place where you will find your new friend</h4>
+</div>
+
+<div class="mb-5"></div>
+
+<div class="text-center">
+    <a href="/Pets/All" class="btn col-md-4 btn-outline-success">FIND PET</a>
+</div>
+
+<div class="mb-5"></div>
+
+<div class="container">
+    <h4 class="modal-title text-center">Your pet adoption journey</h4>
+    <div class="mb-5"></div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col text-center">
+                <h3>SEARCH</h3>
+                <p>
+                    It's easy to find a pet who's right for you at a shelter or rescue group. You can search from @Model.TotalPets pets on the site from @Model.TotalShelters shelters.
+                </p>
+            </div>
+
+            <div class="col text-center">
+                <h3>MEET</h3>
+                <p>
+                    When you find a pet, click "learn more about me" to get more information about the pet and to contact with the shelter.
+                </p>
+            </div>
+
+            <div class="col text-center">
+                <h3>ADOPT</h3>
+                <p>
+                    The shelter will help you with the adoption process. We alredy got @Model.TotalAdoptions successful adoptions. You just need to prepare your home for the arrival of your new family member.
+                </p>
+            </div>
+        </div>
+    </div>
 </div>

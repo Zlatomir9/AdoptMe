@@ -40,7 +40,8 @@
             {
                 UserId = userId,
                 Name = shelter.Name,
-                PhoneNumber = shelter.PhoneNumber
+                PhoneNumber = shelter.PhoneNumber,
+                Email = shelter.Email
             };
 
             this.data.Shelters.Add(shelterData);

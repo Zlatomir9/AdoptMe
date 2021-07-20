@@ -4,6 +4,7 @@
     using AdoptMe.Data.Models;
     using AdoptMe.Infrastructure;
     using AdoptMe.Models.Pets;
+    using AdoptMe.Services.Pets;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using System.Collections.Generic;
@@ -11,45 +12,66 @@
 
     public class PetsController : Controller
     {
+        private readonly IPetService pets;
         private readonly AdoptMeDbContext data;
 
-        public PetsController(AdoptMeDbContext data)
+        public PetsController(AdoptMeDbContext data, IPetService pets)
         {
             this.data = data;
+            this.pets = pets;
         }
 
         public IActionResult All(AllPetsViewModel query)
         {
-            var petsQuery = this.data.Pets.AsQueryable();
+            var species = this.pets.AllSpecies();
 
-            if (!string.IsNullOrEmpty(query.Species))
-            {
-                petsQuery = petsQuery.Where(s => s.Species.Name == query.Species);
-            }
-
-            var pets = petsQuery
-                .Select(x => new PetListingViewModel
-                {
-                    Id = x.Id,
-                    Species = x.Species.ToString(),
-                    Breed = x.Breed,
-                    ImageUrl = x.ImageUrl,
-                    Name = x.Name,
-                    Age = x.Age,
-                    Gender = x.Gender.ToString()
-                })
-                .ToList();
-
-            var species = this.data.Species
-                .Select(s => s.Name)
-                .Distinct()
-                .ToList();
+            var queryResult = this.pets.All(
+                query.Species,
+                query.SearchString);
 
             query.AllSpecies = species;
-            query.Pets = pets;
+            query.Pets = queryResult.Pets;
 
             return View(query);
-        }        
+        }
+
+        public IActionResult Details(int id)
+        {
+            var pet = this.data
+                .Pets
+                .Where(x => x.Id == id)
+                .FirstOrDefault();
+
+            if (pet.Id == 0)
+            {
+                return RedirectToAction(nameof(PetsController.All), "Pets");
+            }
+
+            var petShelter = this.data
+                .Shelters
+                .Where(x => x.Id == pet.ShelterId)
+                .FirstOrDefault();
+
+            var currentPet = new PetDetailsViewModel
+                {
+                    Name = pet.Name,
+                    Breed = pet.Breed,
+                    Age = pet.Age,
+                    Gender = pet.Gender.ToString(),
+                    Color = pet.Color,
+                    MyStory = pet.MyStory,
+                    Species = this.data.Species
+                                .Where(x => x.Id == pet.SpeciesId)
+                                .Select(x => x.Name)
+                                    .ToString(),
+                    Shelter = petShelter.Name,
+                    ShelterEmail = petShelter.Email,
+                    ShelterPhoneNumber = pet.Shelter.PhoneNumber,
+                    ImageUrl = pet.ImageUrl
+                };
+
+            return View(currentPet);
+        }
 
         [Authorize]
         public IActionResult Add() 
@@ -69,7 +91,17 @@
         [Authorize]
         public IActionResult Add(AddPetFormModel pet)
         {
-            if(!this.UserIsShelter())
+            var shelterId = this.data.Shelters
+                .Where(s => s.UserId == this.User.GetId())
+                .Select(s => s.Id)
+                .FirstOrDefault();
+
+            if (shelterId == 0)
+            {
+                return RedirectToAction(nameof(SheltersController.Create), "Dealers");
+            }
+
+            if (!this.UserIsShelter())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
@@ -95,7 +127,8 @@
                 Gender = pet.Gender,
                 MyStory = pet.MyStory,
                 ImageUrl = pet.ImageUrl,
-                SpeciesId = pet.SpeciesId
+                SpeciesId = pet.SpeciesId,
+                ShelterId = shelterId
             };
 
             this.data.Pets.Add(currentPet);

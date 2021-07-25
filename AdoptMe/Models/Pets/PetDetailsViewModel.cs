@@ -2,9 +2,11 @@
 {
     public class PetDetailsViewModel
     {
+        public int Id { get; set; }
+
         public string Name { get; set; }
 
-        public int Age { get; set; }
+        public string Age { get; set; }
 
         public string Gender { get; set; }
 
@@ -18,7 +20,7 @@
 
         public string Species { get; init; }
 
-        public string Shelter { get; init; }
+        public string ShelterName { get; init; }
 
         public string ShelterPhoneNumber { get; init; }
 

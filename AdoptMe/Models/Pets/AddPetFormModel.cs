@@ -13,7 +13,7 @@
         public string Name { get; init; }
 
         [Range(AgeMinValue, AgeMaxValue)]
-        public int Age { get; init; }
+        public Age Age { get; init; }
 
         public Gender Gender { get; init; }
 

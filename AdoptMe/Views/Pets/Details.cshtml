@@ -1,4 +1,4 @@
-﻿@model PetDetailsViewModel
+﻿@model PetDetailsServiceModel
 
 @{
     ViewBag.Title = "Pet info";
@@ -6,6 +6,41 @@
 
 <div class="container-fluid">
     <div>
-        <h2>@Model.Name</h2>
+        <h1>@Model.Name</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-5">
+            <div class="list-group-item mb-2">
+                <h6 class="mb-1">MY STORY:</h6>
+                <p>@Model.MyStory</p>
+            </div>
+
+            <div class="list-group-item mb-2">
+                <h6 class="mb-2">FACTS ABOUT ME:</h6>
+                <p><b>Breed:</b> @Model.Breed</p>
+                <p><b>Age:</b> @Model.Age</p>
+                <p><b>Color:</b> @Model.Color</p>
+                <p><b>Gender:</b> @Model.Gender</p>
+            </div>
+
+            <div class="list-group-item">
+                <h6 class="mb-2">I'M BEING CARED FOR BY:</h6>
+
+                <p><b>Shelter:</b> @Model.ShelterName</p>
+                <p><b>Shelter phone number:</b> @Model.ShelterPhoneNumber</p>
+                <p><b>Shelter email:</b> @Model.ShelterEmail</p>
+            </div>
+
+        </div>
+
+        <div class="col-md-7">
+            <img src="@Model.ImageUrl" alt="image" width="630" height="450" class="rounded mb-4">
+            <div class="text-center">
+                <a asp-controller="Adoptions" asp-action="Form" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a>
+            </div>
+        </div>
     </div>
 </div>

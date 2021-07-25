@@ -38,46 +38,27 @@
             return View(query);
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(PetDetailsServiceModel model)
         {
-            var pet = this.data
-                .Pets
-                .Where(x => x.Id == id)
-                .FirstOrDefault();
+           var modelResult = this.pets.Details(
+                      model.Id,
+                      model.Name,
+                      model.Age,
+                      model.Gender,
+                      model.Breed,
+                      model.Color,
+                      model.MyStory,
+                      model.ImageUrl,
+                      model.Species,
+                      model.ShelterName,
+                      model.ShelterPhoneNumber,
+                      model.ShelterEmail);
 
-            if (pet.Id == 0)
-            {
-                return RedirectToAction(nameof(PetsController.All), "Pets");
-            }
-
-            var petShelter = this.data
-                .Shelters
-                .Where(x => x.Id == pet.ShelterId)
-                .FirstOrDefault();
-
-            var currentPet = new PetDetailsViewModel
-                {
-                    Name = pet.Name,
-                    Breed = pet.Breed,
-                    Age = pet.Age,
-                    Gender = pet.Gender.ToString(),
-                    Color = pet.Color,
-                    MyStory = pet.MyStory,
-                    Species = this.data.Species
-                                .Where(x => x.Id == pet.SpeciesId)
-                                .Select(x => x.Name)
-                                    .ToString(),
-                    Shelter = petShelter.Name,
-                    ShelterEmail = petShelter.Email,
-                    ShelterPhoneNumber = pet.Shelter.PhoneNumber,
-                    ImageUrl = pet.ImageUrl
-                };
-
-            return View(currentPet);
+            return View(modelResult);
         }
 
         [Authorize]
-        public IActionResult Add() 
+        public IActionResult Add()
         {
             if (!this.UserIsShelter())
             {

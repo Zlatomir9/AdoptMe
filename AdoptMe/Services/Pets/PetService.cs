@@ -36,7 +36,7 @@
                     Breed = x.Breed,
                     ImageUrl = x.ImageUrl,
                     Name = x.Name,
-                    Age = x.Age,
+                    Age = x.Age.ToString(),
                     Gender = x.Gender.ToString()
                 })
                 .Skip((pageIndex - 1) * pageSize)
@@ -52,6 +52,29 @@
                 PageSize = pageSize
             };
         }
+
+        public PetDetailsServiceModel Details(int id, string Name, string Age, string Gender, string Breed,
+            string Color, string MyStory, string ImageUrl, string Species, string ShelterName,
+            string ShelterPhoneNumber, string ShelterEmail)
+            => this.data
+                   .Pets
+                   .Where(p => p.Id == id)
+                   .Select(p => new PetDetailsServiceModel
+                   {
+                       Id = p.Id,
+                       Age = p.Age.ToString(),
+                       Breed = p.Breed,
+                       Color = p.Color,
+                       Gender = p.Gender.ToString(),
+                       MyStory = p.MyStory,
+                       Name = p.Name,
+                       ImageUrl = p.ImageUrl,
+                       Species = p.Species.ToString(),
+                       ShelterName = p.Shelter.Name,
+                       ShelterPhoneNumber = p.Shelter.PhoneNumber,
+                       ShelterEmail = p.Shelter.Email
+                   })
+                   .FirstOrDefault();
 
         public IEnumerable<string> AllSpecies()
                 => this.data.Species

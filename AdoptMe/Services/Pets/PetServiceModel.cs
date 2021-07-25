@@ -14,6 +14,6 @@
 
         public string Gender { get; init; }
 
-        public int Age { get; init; }
+        public string Age { get; init; }
     }
 }

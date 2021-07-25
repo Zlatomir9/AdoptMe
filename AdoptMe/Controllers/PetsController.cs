@@ -27,9 +27,12 @@
 
             var queryResult = this.pets.All(
                 query.Species,
-                query.SearchString);
+                query.SearchString,
+                query.PageIndex,
+                AllPetsViewModel.PageSize);
 
             query.AllSpecies = species;
+            query.TotalPets = queryResult.TotalPets;
             query.Pets = queryResult.Pets;
 
             return View(query);

@@ -36,19 +36,55 @@
 <div class="row">
     @foreach (var pet in Model.Pets)
     {
-    <div class="col-3">
-        <div class="card-group mb-3">
-            <div class="card border-info mb-3">
-                <div class="embed-responsive embed-responsive-4by3">
-                    <img class="card-img-top embed-responsive-item" src="@pet.ImageUrl" alt="Card image cap">
-                </div>
-                <div class="card-body text-center">
-                    <h4 class="card-title text-center">@pet.Name</h4>
-                    <p class="card-text text-center">@pet.Gender, @pet.Breed, @pet.Age year(s) old</p>
-                    <a asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" class="btn btn-info">Learn more about me</a>
+        <div class="col-4">
+            <div class="card-group mb-4">
+                <div class="card border-info mb-4">
+                    <div class="embed-responsive embed-responsive-4by3">
+                        <img class="card-img-top embed-responsive-item" src="@pet.ImageUrl" alt="Card image cap">
+                    </div>
+                    <div class="card-body text-center">
+                        <h4 class="card-title text-center">@pet.Name</h4>
+                        <p class="card-text text-center">@pet.Gender, @pet.Breed, @pet.Age year(s) old</p>
+                        <a asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" class="btn btn-info">Learn more about me</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     }
+</div>
+
+
+@{
+    var previousPage = Model.PageIndex - 1;
+    if (previousPage < 1)
+    {
+        previousPage = 1;
+    }
+
+    var maxPage = Math.Ceiling((double)Model.TotalPets / AllPetsViewModel.PageSize);
+}
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.PageIndex == 1 ? "disabled" : string.Empty)"
+           asp-controller="Pets"
+           asp-action="All"
+           asp-route-pageIndex="@previousPage"
+           asp-route-species="@Model.Species"
+           asp-route-searchString="@Model.SearchString">Previous</a>
+    </div>
+
+    @{
+        var shouldButtonBeDisabled = Model.PageIndex == maxPage ||
+                                     !Model.Pets.Any();
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Pets"
+           asp-action="All"
+           asp-route-pageIndex="@(Model.PageIndex + 1)"
+           asp-route-species="@Model.Species"
+           asp-route-searchString="@Model.SearchString">Next</a>
+    </div>
 </div>

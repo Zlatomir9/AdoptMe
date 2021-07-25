@@ -4,7 +4,7 @@
 
     public interface IPetService
     {
-        PetsQueryServiceModel All(string species, string searchString);
+        PetsQueryServiceModel All(string species, string searchString, int pageIndex, int pageSize);
 
         IEnumerable<string> AllSpecies();
     }

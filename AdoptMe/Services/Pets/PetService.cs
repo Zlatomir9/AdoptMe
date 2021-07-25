@@ -12,7 +12,7 @@
             => this.data = data;
 
 
-        public PetsQueryServiceModel All(string species, string searchString)
+        public PetsQueryServiceModel All(string species, string searchString, int pageIndex, int pageSize)
         {
             var petsQuery = this.data.Pets.AsQueryable();
 
@@ -26,6 +26,8 @@
                 petsQuery = petsQuery.Where(s => s.Breed.Contains(searchString));
             }
 
+            var totalPets = petsQuery.Count();
+
             var pets = petsQuery
                 .Select(x => new PetServiceModel
                 {
@@ -37,12 +39,17 @@
                     Age = x.Age,
                     Gender = x.Gender.ToString()
                 })
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
                 .ToList();
 
             return new PetsQueryServiceModel
             {
                 SearchString = searchString,
-                Pets = pets
+                Pets = pets,
+                TotalPets = totalPets,
+                PageIndex = pageIndex,
+                PageSize = pageSize
             };
         }
 

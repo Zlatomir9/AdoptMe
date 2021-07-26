@@ -1,24 +1,27 @@
 ﻿namespace AdoptMe.Controllers
 {
+    using System;
+    using System.Linq;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
     using AdoptMe.Data;
-    using AdoptMe.Data.Models;
+    using AdoptMe.Data.Models.Enums;
     using AdoptMe.Infrastructure;
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Pets;
-    using Microsoft.AspNetCore.Authorization;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Collections.Generic;
-    using System.Linq;
+    using AdoptMe.Services.Shelters;
 
     public class PetsController : Controller
     {
         private readonly IPetService pets;
+        private readonly IShelterService shelters;
         private readonly AdoptMeDbContext data;
 
-        public PetsController(AdoptMeDbContext data, IPetService pets)
+        public PetsController(AdoptMeDbContext data, IPetService pets, IShelterService shelters)
         {
             this.data = data;
             this.pets = pets;
+            this.shelters = shelters;
         }
 
         public IActionResult All(AllPetsViewModel query)
@@ -40,52 +43,32 @@
 
         public IActionResult Details(PetDetailsServiceModel model)
         {
-           var modelResult = this.pets.Details(
-                      model.Id,
-                      model.Name,
-                      model.Age,
-                      model.Gender,
-                      model.Breed,
-                      model.Color,
-                      model.MyStory,
-                      model.ImageUrl,
-                      model.Species,
-                      model.ShelterName,
-                      model.ShelterPhoneNumber,
-                      model.ShelterEmail);
+           var modelResult = this.pets.Details(model.Id);
 
-            return View(modelResult);
+           return View(modelResult);
         }
 
         [Authorize]
         public IActionResult Add()
         {
-            if (!this.UserIsShelter())
+            if (!this.shelters.IsShelter(this.User.GetId()))
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
 
-            return View(new AddPetFormModel
+            return View(new PetFormModel
             {
-                Species = this.GetPetSpecies()
+                Species = this.pets.AllSpecies()
             });
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult Add(AddPetFormModel pet)
+        public IActionResult Add(PetFormModel pet)
         {
-            var shelterId = this.data.Shelters
-                .Where(s => s.UserId == this.User.GetId())
-                .Select(s => s.Id)
-                .FirstOrDefault();
+            var shelterId = this.shelters.IdByUser(this.User.GetId());
 
             if (shelterId == 0)
-            {
-                return RedirectToAction(nameof(SheltersController.Create), "Dealers");
-            }
-
-            if (!this.UserIsShelter())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
@@ -97,42 +80,96 @@
 
             if (!ModelState.IsValid)
             {
-                pet.Species = this.GetPetSpecies();
+                pet.Species = this.pets.AllSpecies();
 
                 return View(pet);
             }
 
-            var currentPet = new Pet
-            {
-                Name = pet.Name,
-                Age = pet.Age,
-                Breed = pet.Breed,
-                Color = pet.Color,
-                Gender = pet.Gender,
-                MyStory = pet.MyStory,
-                ImageUrl = pet.ImageUrl,
-                SpeciesId = pet.SpeciesId,
-                ShelterId = shelterId
-            };
+            this.pets.Add(
+                pet.Name,
+                pet.Age,
+                pet.Breed,
+                pet.Color,
+                pet.Gender,
+                pet.MyStory,
+                pet.ImageUrl,
+                pet.SpeciesId,
+                shelterId);
 
-            this.data.Pets.Add(currentPet);
-            this.data.SaveChanges();
-
-            return RedirectToAction("All", "Pets");
+            return RedirectToAction(nameof(All));
         }
 
-        private bool UserIsShelter()
-            => this.data
-                .Shelters
-                .Any(s => s.UserId == this.User.GetId());
+        [Authorize]
+        public IActionResult Edit(int id)
+        {
+            var userId = this.User.GetId();
 
-        private IEnumerable<PetSpeciesViewModel> GetPetSpecies()
-            => this.data.Species
-                        .Select(s => new PetSpeciesViewModel
-                        {
-                            Id = s.Id,
-                            Name = s.Name
-                        })
-                        .ToList();
+            if (!this.shelters.IsShelter(userId))
+            {
+                return RedirectToAction(nameof(SheltersController.Create), "Shelters");
+            }
+
+            var pet = this.pets.Details(id);
+
+            if (pet.UserId != userId)
+            {
+                return Unauthorized();
+            }
+
+            return View(new PetFormModel
+            {
+                Breed = pet.Breed,
+                Name = pet.Name,
+                Age = Enum.Parse<Age>(pet.Age),
+                Color = pet.Color,
+                Gender = Enum.Parse<Gender>(pet.Gender),
+                SpeciesId = pet.SpeciesId,
+                ImageUrl = pet.ImageUrl,
+                MyStory = pet.MyStory,
+                Species = this.pets.AllSpecies()
+            });
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Edit(int id, PetFormModel pet)
+        {
+            var shelterId = this.shelters.IdByUser(this.User.GetId());
+
+            if (shelterId == 0)
+            {
+                return RedirectToAction(nameof(SheltersController.Create), "Shelters");
+            }
+
+            if (!this.pets.SpeciesExists(pet.SpeciesId))
+            {
+                this.ModelState.AddModelError(nameof(pet.SpeciesId), "Species is not supported.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                pet.Species = this.pets.AllSpecies();
+
+                return View(pet);
+            }
+
+            if (!this.pets.IsByShelter(id, shelterId))
+            {
+                return BadRequest();
+            }
+
+            this.pets.Edit(
+                id,
+                pet.Name,
+                pet.Age,
+                pet.Breed,
+                pet.Color,
+                pet.Gender,
+                pet.MyStory,
+                pet.ImageUrl,
+                pet.SpeciesId);
+
+            return RedirectToAction(nameof(All));
+        }
     }
 }

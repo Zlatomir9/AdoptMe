@@ -3,6 +3,7 @@ namespace AdoptMe
     using AdoptMe.Data;
     using AdoptMe.Infrastructure;
     using AdoptMe.Services.Pets;
+    using AdoptMe.Services.Shelters;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
@@ -32,12 +33,14 @@ namespace AdoptMe
                         options.Password.RequireNonAlphanumeric = false;
                         options.Password.RequireUppercase = false;
                     })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<AdoptMeDbContext>();
 
             services
                 .AddControllersWithViews();
 
-            services.AddTransient<IPetService, PetService>();
+            services.AddTransient<IPetService, PetService>()
+                    .AddTransient<IShelterService, ShelterService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -18,7 +18,7 @@
 
         public int TotalPets { get; set; }
 
-        public IEnumerable<string> AllSpecies { get; set; }
+        public IEnumerable<PetSpeciesServiceModel> AllSpecies { get; set; }
 
         public IEnumerable<PetServiceModel> Pets { get; set; }
     }

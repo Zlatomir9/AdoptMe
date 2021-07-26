@@ -3,6 +3,8 @@
     using System.Linq;
     using System.Collections.Generic;
     using AdoptMe.Data;
+    using AdoptMe.Data.Models;
+    using AdoptMe.Data.Models.Enums;
 
     public class PetService : IPetService
     {
@@ -53,9 +55,7 @@
             };
         }
 
-        public PetDetailsServiceModel Details(int id, string Name, string Age, string Gender, string Breed,
-            string Color, string MyStory, string ImageUrl, string Species, string ShelterName,
-            string ShelterPhoneNumber, string ShelterEmail)
+        public PetDetailsServiceModel Details(int id)
             => this.data
                    .Pets
                    .Where(p => p.Id == id)
@@ -72,14 +72,95 @@
                        Species = p.Species.ToString(),
                        ShelterName = p.Shelter.Name,
                        ShelterPhoneNumber = p.Shelter.PhoneNumber,
-                       ShelterEmail = p.Shelter.Email
+                       ShelterEmail = p.Shelter.Email,
+                       UserId = p.Shelter.UserId,
+                       SpeciesId = p.SpeciesId
                    })
                    .FirstOrDefault();
 
-        public IEnumerable<string> AllSpecies()
-                => this.data.Species
-                .Select(s => s.Name)
-                .Distinct()
+        public int Add(string name, Age age, string breed, string color, Gender gender,
+            string myStory, string imageUrl, int speciesId, int shelterId)
+        {
+            var petData = new Pet
+            {
+                Name = name,
+                Age = age,
+                Breed = breed,
+                Color = color,
+                Gender = gender,
+                MyStory = myStory,
+                ImageUrl = imageUrl,
+                SpeciesId = speciesId,
+                ShelterId = shelterId
+            };
+
+            this.data.Pets.Add(petData);
+            this.data.SaveChanges();
+
+            return petData.Id;
+        }
+
+        public bool Edit(int id, string name, Age age, string breed, string color, Gender gender,
+                    string myStory, string imageUrl, int speciesId)
+        {
+            var petData = this.data.Pets.Find(id);
+
+            if (petData == null)
+            {
+                return false;
+            }
+
+            petData.Name = name;
+            petData.Age = age;
+            petData.Breed = breed;
+            petData.Color = color;
+            petData.Gender = gender;
+            petData.MyStory = myStory;
+            petData.ImageUrl = imageUrl;
+            petData.SpeciesId = speciesId;
+
+            this.data.SaveChanges();
+
+            return true;
+        }
+
+        public IEnumerable<PetSpeciesServiceModel> AllSpecies()
+           => this.data
+               .Species
+               .Select(c => new PetSpeciesServiceModel
+               {
+                   Id = c.Id,
+                   Name = c.Name
+               })
+               .ToList();
+
+        public IEnumerable<PetServiceModel> ByUser(string userId)
+            => GetPets(this.data
+                .Pets
+                .Where(c => c.Shelter.UserId == userId));
+
+        public bool IsByShelter(int petId, int shelterId)
+            => this.data
+                .Pets
+                .Any(c => c.Id == petId && c.ShelterId == shelterId);
+
+        public bool SpeciesExists(int speciesId)
+            => this.data
+                .Species
+                .Any(c => c.Id == speciesId);
+
+        private static IEnumerable<PetServiceModel> GetPets(IQueryable<Pet> petQuery)
+            => petQuery
+                .Select(c => new PetServiceModel
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Age = c.Age.ToString(),
+                    Species = c.Species.Name,
+                    Breed = c.Breed,
+                    Gender = c.Gender.ToString(),
+                    ImageUrl = c.ImageUrl
+                })
                 .ToList();
     }
 }

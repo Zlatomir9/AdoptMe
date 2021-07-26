@@ -6,6 +6,10 @@
 
         public string MyStory { get; set; }
 
+        public int SpeciesId { get; set; }
+
+        public string UserId { get; set; }
+
         public string ShelterName { get; init; }
 
         public string ShelterPhoneNumber { get; init; }

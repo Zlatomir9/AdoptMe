@@ -44,8 +44,12 @@
                     </div>
                     <div class="card-body text-center">
                         <h4 class="card-title text-center">@pet.Name</h4>
-                        <p class="card-text text-center">@pet.Gender, @pet.Breed, @pet.Age year(s) old</p>
-                        <a asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" class="btn btn-info">Learn more about me</a>
+                        <p class="card-text text-center">@pet.Gender, @pet.Breed, @pet.Age</p>
+                        <div class=" text-center">
+                            <a asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-outline-primary">Info</a>
+                            <a asp-controller="Pets" asp-action="Edit" asp-route-id="@pet.Id" class="btn btn-outline-warning">Edit</a>
+                            <a asp-controller="Pets" asp-action="Delete" asp-route-id="@pet.Id" class="btn btn-outline-danger">Delete</a>
+                        </div>
                     </div>
                 </div>
             </div>

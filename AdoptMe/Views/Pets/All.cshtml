@@ -32,31 +32,7 @@
     </div>
 </form>
 
-
-<div class="row">
-    @foreach (var pet in Model.Pets)
-    {
-        <div class="col-4">
-            <div class="card-group mb-4">
-                <div class="card border-info mb-4">
-                    <div class="embed-responsive embed-responsive-4by3">
-                        <img class="card-img-top embed-responsive-item" src="@pet.ImageUrl" alt="Card image cap">
-                    </div>
-                    <div class="card-body text-center">
-                        <h4 class="card-title text-center">@pet.Name</h4>
-                        <p class="card-text text-center">@pet.Gender, @pet.Breed, @pet.Age</p>
-                        <div class=" text-center">
-                            <a asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-outline-primary">Info</a>
-                            <a asp-controller="Pets" asp-action="Edit" asp-route-id="@pet.Id" class="btn btn-outline-warning">Edit</a>
-                            <a asp-controller="Pets" asp-action="Delete" asp-route-id="@pet.Id" class="btn btn-outline-danger">Delete</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
-
+<partial name="_PetsPartial" model="@Model.Pets" />
 
 @{
     var previousPage = Model.PageIndex - 1;
@@ -92,3 +68,8 @@
            asp-route-searchString="@Model.SearchString">Next</a>
     </div>
 </div>
+
+@if (!Model.Pets.Any())
+{
+    <h2 class="text-center">No pets found!</h2>
+}

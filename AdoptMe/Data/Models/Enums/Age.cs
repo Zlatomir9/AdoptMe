@@ -2,9 +2,8 @@
 {
     public enum Age
     {
-        Puppy = 1,
-        Young = 2,
-        Adult = 3,
-        Senior = 4
+        Young = 1,
+        Adult = 2,
+        Senior = 3
     }
 }

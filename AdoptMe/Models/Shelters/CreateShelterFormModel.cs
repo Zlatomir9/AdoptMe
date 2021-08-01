@@ -1,5 +1,6 @@
 ﻿namespace AdoptMe.Models.Shelters
 {
+    using Microsoft.AspNetCore.Identity;
     using System.ComponentModel.DataAnnotations;
 
     using static Data.DataConstants.ShelterRequirements;

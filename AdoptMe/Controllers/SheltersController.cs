@@ -7,7 +7,7 @@
     using AdoptMe.Infrastructure;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Services.Shelters;
-
+    
     public class SheltersController : Controller
     {
         private readonly AdoptMeDbContext data;

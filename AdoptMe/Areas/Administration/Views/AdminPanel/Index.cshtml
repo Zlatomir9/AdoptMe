@@ -1,0 +1,18 @@
+﻿@{
+    this.ViewData["Title"] = "Admin panel";
+}
+
+<h1 class="display-4">Dashboard</h1>
+
+<nav class="navbar navbar-vertical">
+    <div class="navbar-collapse">
+        <ul class="navbar-nav flex-grow-1">
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Administration" asp-controller="AdminPanel" asp-action="ShelterRequests">Pending registration requests</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Administration" asp-controller="AdminPanel" asp-action="AllPets">All active pets ads</a>
+            </li>
+        </ul>
+    </div>
+</nav>

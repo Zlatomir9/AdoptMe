@@ -1,17 +1,28 @@
 ﻿<ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(this.User))
     {
-        @if (sheltersService.IsShelter(UserManager.GetUserId(this.User)) && !this.User.IsInRole(AdminRoleName))
+        var userId = UserManager.GetUserId(this.User);
+
+        @if (sheltersService.IsShelter(userId) && !this.User.IsInRole(AdminRoleName))
         {
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="MyPets">My pets</a>
             </li>
         }
 
-        else if (!this.User.IsInRole(AdminRoleName))
+        else if (!this.User.IsInRole(AdminRoleName) 
+            && !sheltersService.RegistrationIsSubmitted(userId) 
+            && !sheltersService.RegistrationIsDeclined(userId))
         {
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="" asp-controller="Shelters" asp-action="Create">Register as shelter</a>
+            </li>
+        }
+
+        else if (this.User.IsInRole(AdminRoleName))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="Administration" asp-controller="AdminPanel" asp-action="Index">Administration panel</a>
             </li>
         }
 

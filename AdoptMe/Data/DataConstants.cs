@@ -39,9 +39,10 @@
 
         public class Administrator
         {
-            public const string adminEmail = "admin@pets.com";
-            public const string adminPassword = "petadmin";
-            public const string adminUsername = "admin";
+            public const string AdminEmail = "admin@pets.com";
+            public const string AdminPassword = "petadmin";
+            public const string AdminUsername = "admin";
+            public const string AdminAreaName = "Administration";
         }
     }
 }

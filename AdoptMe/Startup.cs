@@ -2,6 +2,7 @@ namespace AdoptMe
 {
     using AdoptMe.Data;
     using AdoptMe.Infrastructure;
+    using AdoptMe.Services.Administration;
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
     using Microsoft.AspNetCore.Builder;
@@ -43,7 +44,8 @@ namespace AdoptMe
             });
 
             services.AddTransient<IPetService, PetService>()
-                    .AddTransient<IShelterService, ShelterService>();
+                    .AddTransient<IShelterService, ShelterService>()
+                    .AddTransient<IAdministrationService, AdministrationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -67,6 +69,7 @@ namespace AdoptMe
                .UseAuthorization()
                .UseEndpoints(endpoints =>
                {
+                   endpoints.MapDefaultAreaRoute();
                    endpoints.MapDefaultControllerRoute();
                    endpoints.MapRazorPages();
                });

@@ -1,8 +1,9 @@
 ﻿namespace AdoptMe.Services.Shelters
 {
+    using System.Linq;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
-    using System.Linq;
+    using AdoptMe.Data.Models.Enums;
 
     public class ShelterService : IShelterService
     {
@@ -18,7 +19,8 @@
                 UserId = userId,
                 Name = name,
                 PhoneNumber = phoneNumber,
-                Email = email
+                Email = email,
+                RegistrationStatus = RegistrationStatus.Submitted
             };
 
             this.data.Shelters.Add(shelterData);
@@ -44,6 +46,16 @@
         public bool IsShelter(string userId)
             => this.data
                    .Shelters
-                   .Any(s => s.UserId == userId);
+                   .Any(s => s.UserId == userId && s.RegistrationStatus == RegistrationStatus.Аccepted);
+
+        public bool RegistrationIsSubmitted(string userId)
+            => this.data
+                   .Shelters
+                   .Any(s => s.UserId == userId && s.RegistrationStatus == RegistrationStatus.Submitted);
+
+        public bool RegistrationIsDeclined(string userId)
+            => this.data
+                   .Shelters
+                   .Any(s => s.UserId == userId && s.RegistrationStatus == RegistrationStatus.Declined);
     }
 }

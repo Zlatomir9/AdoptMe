@@ -82,11 +82,11 @@
                 {
                     var user = new IdentityUser
                     {
-                        Email = adminEmail,
-                        UserName = adminUsername
+                        Email = AdminEmail,
+                        UserName = AdminUsername
                     };
 
-                    await userManager.CreateAsync(user, adminPassword);
+                    await userManager.CreateAsync(user, AdminPassword);
 
                     await userManager.AddToRoleAsync(user, AdminRoleName);
                 })

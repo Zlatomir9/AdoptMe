@@ -1,0 +1,59 @@
+﻿@model AllSheltersRequestsViewModel
+
+@{ ViewBag.Title = "Users request to be shelters"; }
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone Number</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var shelter in Model.Shelters)
+        {
+            <tr>
+                <td>@shelter.Name</td>
+                <td>@shelter.Email</td>
+                <td>@shelter.PhoneNumber</td>
+                <td>
+                    <form method="post">
+                        <button type="submit" class="btn btn-success" asp-area="Administration" asp-controller="AdminPanel" asp-action="АcceptRequest" asp-route-id="@shelter.Id">Accept</button>
+                        <button type="submit" class="btn btn-danger" asp-area="Administration" asp-controller="AdminPanel" asp-action="DeclineRequest" asp-route-id="@shelter.Id">Decline</button>
+                    </form>
+                </td>
+            </tr>            }
+    </tbody>
+</table>
+
+@{ var previousPage = Model.PageIndex - 1;
+    if (previousPage < 1)
+    {
+        previousPage = 1;
+    }
+
+    var maxPage = Math.Ceiling(((double)Model.TotalShelters) / AllSheltersRequestsViewModel.PageSize); }
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.PageIndex == 1 ? "disabled" : string.Empty)"
+           asp-controller="AdminPanel"
+           asp-action="ShelterRequests"
+           asp-route-pageIndex="@previousPage">Previous</a>
+    </div>
+
+    @{ var shouldButtonBeDisabled = Model.PageIndex == maxPage || !Model.Shelters.Any(); }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="AdminPanel"
+           asp-action="ShelterRequests"
+           asp-route-pageIndex="@(Model.PageIndex + 1)">Next</a>
+    </div>
+</div>
+
+@if (!Model.Shelters.Any())
+{
+<h2 class="text-center">No requests found!</h2>}

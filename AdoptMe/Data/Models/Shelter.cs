@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using AdoptMe.Data.Models.Enums;
 
     using static DataConstants.ShelterRequirements;
 
@@ -19,6 +20,8 @@
         
         [Required]
         public string Email { get; set; }
+
+        public RegistrationStatus RegistrationStatus { get; set; }
 
         [Required]
         public string UserId { get; set; }

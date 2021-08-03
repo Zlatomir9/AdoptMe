@@ -1,7 +1,6 @@
 ﻿namespace AdoptMe.Models.Pets
 {
     using AdoptMe.Data.Models.Enums;
-    using AdoptMe.Services.Pets;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
@@ -36,6 +35,6 @@
         [Display(Name = "Species")]
         public int SpeciesId { get; init; }
 
-        public IEnumerable<PetSpeciesServiceModel> Species { get; set; }
+        public IEnumerable<PetSpeciesModel> Species { get; set; }
     }
 }

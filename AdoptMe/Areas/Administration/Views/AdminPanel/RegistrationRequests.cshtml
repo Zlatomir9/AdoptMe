@@ -1,6 +1,6 @@
-﻿@model AllSheltersRequestsViewModel
+﻿@model RegistrationRequestsViewModel
 
-@{ ViewBag.Title = "Users request to be shelters"; }
+@{ ViewBag.Title = "All registration requests"; }
 
 <table class="table table-sm">
     <thead>
@@ -14,19 +14,24 @@
     <tbody>
         @foreach (var shelter in Model.Shelters)
         {
-            <tr>
-                <td>@shelter.Name</td>
-                <td>@shelter.Email</td>
-                <td>@shelter.PhoneNumber</td>
-                <td>
-                    <form method="post">
-                        <button type="submit" class="btn btn-success" asp-area="Administration" asp-controller="AdminPanel" asp-action="АcceptRequest" asp-route-id="@shelter.Id">Accept</button>
-                        <button type="submit" class="btn btn-danger" asp-area="Administration" asp-controller="AdminPanel" asp-action="DeclineRequest" asp-route-id="@shelter.Id">Decline</button>
-                    </form>
-                </td>
-            </tr>            }
+<tr>
+    <td>@shelter.Name</td>
+    <td>@shelter.Email</td>
+    <td>@shelter.PhoneNumber</td>
+    <td>
+        <form method="post">
+            <button type="submit" class="btn btn-success" asp-area="Administration" asp-controller="AdminPanel" asp-action="АcceptRequest" asp-route-id="@shelter.Id">Accept</button>
+            <button type="submit" class="btn btn-danger" asp-area="Administration" asp-controller="AdminPanel" asp-action="DeclineRequest" asp-route-id="@shelter.Id">Decline</button>
+        </form>
+    </td>
+</tr>}
     </tbody>
 </table>
+
+@if (!Model.Shelters.Any())
+{
+    <h2 class="text-center">No requests found!</h2>
+}
 
 @{ var previousPage = Model.PageIndex - 1;
     if (previousPage < 1)
@@ -34,7 +39,7 @@
         previousPage = 1;
     }
 
-    var maxPage = Math.Ceiling(((double)Model.TotalShelters) / AllSheltersRequestsViewModel.PageSize); }
+    var maxPage = Math.Ceiling(((double)Model.TotalShelters) / AdminPanelPagesSize); }
 
 <div class="row mb-5">
     <div class="col-md-6">
@@ -53,7 +58,3 @@
            asp-route-pageIndex="@(Model.PageIndex + 1)">Next</a>
     </div>
 </div>
-
-@if (!Model.Shelters.Any())
-{
-<h2 class="text-center">No requests found!</h2>}

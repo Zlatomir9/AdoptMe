@@ -1,6 +1,7 @@
 ﻿namespace AdoptMe.Data.Models
 {
     using AdoptMe.Data.Models.Enums;
+    using System;
     using System.ComponentModel.DataAnnotations;
 
     using static DataConstants.PetRequirements;
@@ -32,7 +33,8 @@
 
         public bool IsAdopted { get; set; }
 
-        [Required]
+        public DateTime DateAdded { get; set; }
+
         public int SpeciesId { get; set; }
 
         public Species Species { get; init; }

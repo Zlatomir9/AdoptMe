@@ -1,10 +1,14 @@
 ﻿namespace AdoptMe.Services.Pets
 {
+    using System;
     using System.Linq;
     using System.Collections.Generic;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
+    using AdoptMe.Models.Pets;
+
+    using static Common.GlobalConstants.PageSizes;
 
     public class PetService : IPetService
     {
@@ -14,7 +18,7 @@
             => this.data = data;
 
 
-        public PetsQueryServiceModel All(string species, string searchString, int pageIndex, int pageSize)
+        public AllPetsViewModel All(string species, string searchString, int pageIndex)
         {
             var petsQuery = this.data.Pets.AsQueryable();
 
@@ -31,7 +35,7 @@
             var totalPets = petsQuery.Count();
 
             var pets = petsQuery
-                .Select(x => new PetServiceModel
+                .Select(x => new PetViewModel
                 {
                     Id = x.Id,
                     Species = x.Species.ToString(),
@@ -39,27 +43,28 @@
                     ImageUrl = x.ImageUrl,
                     Name = x.Name,
                     Age = x.Age.ToString(),
-                    Gender = x.Gender.ToString()
+                    Gender = x.Gender.ToString(),
+                    DateAdded = x.DateAdded
                 })
-                .Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
+                .OrderBy(d => d.DateAdded)
+                .Skip((pageIndex - 1) * AllPetsPageSize)
+                .Take(AllPetsPageSize)
                 .ToList();
 
-            return new PetsQueryServiceModel
+            return new AllPetsViewModel
             {
-                SearchString = searchString,
                 Pets = pets,
-                TotalPets = totalPets,
+                SearchString = searchString,
                 PageIndex = pageIndex,
-                PageSize = pageSize
+                TotalPets = totalPets
             };
         }
 
-        public PetDetailsServiceModel Details(int id)
+        public PetDetailsViewModel Details(int id)
             => this.data
                    .Pets
                    .Where(p => p.Id == id)
-                   .Select(p => new PetDetailsServiceModel
+                   .Select(p => new PetDetailsViewModel
                    {
                        Id = p.Id,
                        Age = p.Age.ToString(),
@@ -74,7 +79,8 @@
                        ShelterPhoneNumber = p.Shelter.PhoneNumber,
                        ShelterEmail = p.Shelter.Email,
                        UserId = p.Shelter.UserId,
-                       SpeciesId = p.SpeciesId
+                       SpeciesId = p.SpeciesId,
+                       DateAdded = DateTime.UtcNow
                    })
                    .FirstOrDefault();
 
@@ -124,17 +130,17 @@
             return true;
         }
 
-        public IEnumerable<PetSpeciesServiceModel> AllSpecies()
+        public IEnumerable<PetSpeciesModel> AllSpecies()
            => this.data
                .Species
-               .Select(c => new PetSpeciesServiceModel
+               .Select(c => new PetSpeciesModel
                {
                    Id = c.Id,
                    Name = c.Name
                })
                .ToList();
 
-        public IEnumerable<PetServiceModel> ByUser(string userId)
+        public IEnumerable<PetViewModel> ByUser(string userId)
             => GetPets(this.data
                 .Pets
                 .Where(c => c.Shelter.UserId == userId));
@@ -149,9 +155,9 @@
                 .Species
                 .Any(c => c.Id == speciesId);
 
-        private static IEnumerable<PetServiceModel> GetPets(IQueryable<Pet> petQuery)
+        private static IEnumerable<PetViewModel> GetPets(IQueryable<Pet> petQuery)
             => petQuery
-                .Select(c => new PetServiceModel
+                .Select(c => new PetViewModel
                 {
                     Id = c.Id,
                     Name = c.Name,

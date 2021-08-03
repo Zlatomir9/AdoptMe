@@ -10,8 +10,8 @@
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
 
-    using static Data.DataConstants.Roles;
-    using static Data.DataConstants.Administrator;
+    using static Common.GlobalConstants.Roles;
+    using static Common.GlobalConstants.Administrator;
 
     public static class ApplicationBuilderExtensions
     {

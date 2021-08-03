@@ -1,4 +1,4 @@
-﻿namespace AdoptMe.Areas.Administration.Models.Shelters
+﻿namespace AdoptMe.Models.Shelters
 {
     public class ShelterDetailsViewModel
     {

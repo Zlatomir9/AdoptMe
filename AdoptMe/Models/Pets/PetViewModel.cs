@@ -1,6 +1,8 @@
-﻿namespace AdoptMe.Services.Pets
+﻿namespace AdoptMe.Models.Pets
 {
-    public class PetServiceModel
+    using System;
+
+    public class PetViewModel
     {
         public int Id { get; init; }
 
@@ -15,5 +17,7 @@
         public string Gender { get; init; }
 
         public string Age { get; init; }
+
+        public DateTime DateAdded { get; set; }
     }
 }

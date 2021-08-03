@@ -1,6 +1,6 @@
-﻿namespace AdoptMe.Services.Pets
+﻿namespace AdoptMe.Models.Pets
 {
-    public class PetSpeciesServiceModel
+    public class PetSpeciesModel
     {
         public int Id { get; init; }
 

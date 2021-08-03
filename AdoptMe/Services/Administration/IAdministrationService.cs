@@ -1,9 +1,12 @@
 ﻿namespace AdoptMe.Services.Administration
 {
-    using AdoptMe.Areas.Administration.Models.Shelters;
+    using AdoptMe.Models.Pets;
+    using AdoptMe.Models.Shelters;
 
     public interface IAdministrationService
     {
-        SheltersQueryViewModel ShelterRequests(int pageIndex, int pageSize);
+        RegistrationRequestsViewModel RegistrationRequests(int pageIndex);
+
+        AllPetsViewModel AllPets(int pageIndex);
     }
 }

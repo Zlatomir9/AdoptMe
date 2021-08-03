@@ -6,8 +6,9 @@
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Services.Administration;
-    using AdoptMe.Areas.Administration.Models.Shelters;
-    
+    using AdoptMe.Models.Pets;
+    using AdoptMe.Models.Shelters;
+
     public class AdminPanelController : AdministrationController
     {
         private readonly IAdministrationService administration;
@@ -21,11 +22,10 @@
 
         public IActionResult Index() => View();
 
-        public IActionResult ShelterRequests(AllSheltersRequestsViewModel query)
+        public IActionResult RegistrationRequests(RegistrationRequestsViewModel query)
         {
-            var queryResult = this.administration.ShelterRequests(
-                query.PageIndex,
-                AllSheltersRequestsViewModel.PageSize);
+            var queryResult = this.administration.RegistrationRequests(
+                query.PageIndex);
 
             query.Shelters = queryResult.Shelters;
             query.TotalShelters = queryResult.TotalShelters;
@@ -65,6 +65,17 @@
             this.data.SaveChanges();
 
             return this.RedirectToAction("ShelterRequests");
+        }
+
+        public IActionResult AllPets(AllPetsViewModel query)
+        {
+            var queryResult = this.administration.AllPets(
+                query.PageIndex);
+
+            query.TotalPets = queryResult.TotalPets;
+            query.Pets = queryResult.Pets;
+
+            return View(query);
         }
 
         public Shelter GetShelterById(int id)

@@ -1,4 +1,5 @@
-﻿@model AllPetsViewModel
+﻿@using static AdoptMe.Common.GlobalConstants.PageSizes
+@model AllPetsViewModel
 
 @{
     ViewBag.Title = "All pets at one place";
@@ -14,14 +15,14 @@
                 <option value="">All</option>
                 @foreach (var species in Model.AllSpecies)
                 {
-                    <option value="@species">@species</option>
+                    <option value="@species.Name">@species.Name</option>
                 }
             </select>
         </div>
 
         <div class="col-md-4 mb-2">
             <label asp-for="SearchString"></label>
-            <input asp-for="SearchString" class="form-control" placeholder="Bulldog, Persian cat...">
+            <input asp-for="SearchString" class="form-control" placeholder="Bulldog, Labrador, Persian cat...">
         </div>
 
         <div class="col-md-5 mb-5">
@@ -34,6 +35,11 @@
 
 <partial name="_PetsPartial" model="@Model.Pets" />
 
+@if (!Model.Pets.Any())
+{
+    <h2 class="text-center">No pets found!</h2>
+}
+
 @{
     var previousPage = Model.PageIndex - 1;
     if (previousPage < 1)
@@ -41,7 +47,7 @@
         previousPage = 1;
     }
 
-    var maxPage = Math.Ceiling((double)Model.TotalPets / AllPetsViewModel.PageSize);
+    var maxPage = Math.Ceiling((double)Model.TotalPets / AllPetsPageSize);
 }
 
 <div class="row mb-5">
@@ -68,8 +74,3 @@
            asp-route-searchString="@Model.SearchString">Next</a>
     </div>
 </div>
-
-@if (!Model.Pets.Any())
-{
-    <h2 class="text-center">No pets found!</h2>
-}

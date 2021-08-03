@@ -2,8 +2,11 @@
 {
     using System.Linq;
     using AdoptMe.Data;
-    using AdoptMe.Areas.Administration.Models.Shelters;
+    using AdoptMe.Models.Shelters;
     using AdoptMe.Data.Models.Enums;
+    using AdoptMe.Models.Pets;
+
+    using static Common.GlobalConstants.PageSizes;
 
     public class AdministrationService : IAdministrationService
     {
@@ -12,7 +15,7 @@
         public AdministrationService(AdoptMeDbContext data)
             => this.data = data;
 
-        public SheltersQueryViewModel ShelterRequests(int pageIndex, int pageSize)
+        public RegistrationRequestsViewModel RegistrationRequests(int pageIndex)
         {
             var sheltersQuery = this.data
                 .Shelters
@@ -27,16 +30,42 @@
                     Email = x.Email,
                     PhoneNumber = x.PhoneNumber
                 })
-                .Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
+                .Skip((pageIndex - 1) * AdminPanelPagesSize)
+                .Take(AdminPanelPagesSize)
                 .ToList();
 
-            return new SheltersQueryViewModel
+            return new RegistrationRequestsViewModel
             {
                 Shelters = shelters,
                 PageIndex = pageIndex,
-                PageSize = pageSize,
                 TotalShelters = sheltersQuery.Count()
+            };
+        }
+
+        public AllPetsViewModel AllPets(int pageIndex)
+        {
+            var petsQuery = this.data.Pets.AsQueryable();
+
+            var pets = petsQuery
+                .Select(x => new PetViewModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Species = x.Species.Name,
+                    Breed = x.Breed,
+                    ImageUrl = x.ImageUrl,
+                    DateAdded = x.DateAdded
+                })
+                .OrderBy(d => d.DateAdded)
+                .Skip((pageIndex - 1) * AdminPanelPagesSize)
+                .Take(AdminPanelPagesSize)
+                .ToList();
+
+            return new AllPetsViewModel
+            {
+                Pets = pets,
+                PageIndex = pageIndex,
+                TotalPets = petsQuery.Count()
             };
         }
     }

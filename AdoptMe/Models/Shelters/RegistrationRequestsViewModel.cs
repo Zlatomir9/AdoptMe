@@ -1,11 +1,9 @@
-﻿namespace AdoptMe.Areas.Administration.Models.Shelters
+﻿namespace AdoptMe.Models.Shelters
 {
     using System.Collections.Generic;
 
-    public class AllSheltersRequestsViewModel
+    public class RegistrationRequestsViewModel
     {
-        public const int PageSize = 5;
-
         public int PageIndex { get; init; } = 1;
 
         public int TotalShelters { get; set; }

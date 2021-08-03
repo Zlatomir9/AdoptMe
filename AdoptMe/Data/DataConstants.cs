@@ -30,19 +30,5 @@
             public const string UserPasswordErrorMessage = "The {0} must be at least {2} and at max {1} characters long.";
             public const string ConfirmPasswordErrorMessage = "The password and confirmation password do not match.";
         }
-
-        public class Roles
-        {
-            public const string AdminRoleName = "Administrator";
-            public const string ShelterRoleName = "Shelter";
-        }
-
-        public class Administrator
-        {
-            public const string AdminEmail = "admin@pets.com";
-            public const string AdminPassword = "petadmin";
-            public const string AdminUsername = "admin";
-            public const string AdminAreaName = "Administration";
-        }
     }
 }

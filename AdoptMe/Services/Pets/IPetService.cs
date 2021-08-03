@@ -2,12 +2,13 @@
 {
     using System.Collections.Generic;
     using AdoptMe.Data.Models.Enums;
+    using AdoptMe.Models.Pets;
 
     public interface IPetService
     {
-        PetsQueryServiceModel All(string species, string searchString, int pageIndex, int pageSize);
+        AllPetsViewModel All(string species, string searchString, int pageIndex);
 
-        PetDetailsServiceModel Details(int id);
+        PetDetailsViewModel Details(int id);
 
         int Add(string name, Age age, string breed, string color, Gender gender, string myStory, 
                 string imageUrl, int speciesId, int shelterId);
@@ -15,12 +16,12 @@
         bool Edit(int id, string name, Age age, string breed, string color, Gender gender,
                 string myStory, string imageUrl, int speciesId);
 
-        IEnumerable<PetSpeciesServiceModel> AllSpecies();
+        IEnumerable<PetSpeciesModel> AllSpecies();
 
         bool IsByShelter(int petId, int shelterId);
 
         public bool SpeciesExists(int speciesId);
 
-        IEnumerable<PetServiceModel> ByUser(string userId);
+        IEnumerable<PetViewModel> ByUser(string userId);
     }
 }

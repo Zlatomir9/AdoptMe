@@ -35,6 +35,6 @@
         [Display(Name = "Species")]
         public int SpeciesId { get; init; }
 
-        public IEnumerable<PetSpeciesModel> Species { get; set; }
+        public IEnumerable<PetSpeciesModel> AllSpecies { get; set; }
     }
 }

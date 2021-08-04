@@ -8,7 +8,7 @@
             <div class="form-group">
                 <label asp-for="SpeciesId"></label>
                 <select asp-for="SpeciesId" class="form-control">
-                    @foreach (var species in Model.Species)
+                    @foreach (var species in Model.AllSpecies)
                     {
                         <option value="@species.Id">@species.Name</option>
                     }

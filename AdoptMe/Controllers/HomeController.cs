@@ -1,11 +1,13 @@
 ﻿namespace AdoptMe.Controllers
 {
+    using System.Linq;
+    using System.Diagnostics;
+    using Microsoft.AspNetCore.Mvc;
     using AdoptMe.Data;
     using AdoptMe.Models;
     using AdoptMe.Models.Home;
-    using Microsoft.AspNetCore.Mvc;
-    using System.Diagnostics;
-    using System.Linq;
+
+    using static Data.Models.Enums.RegistrationStatus;
 
     public class HomeController : Controller
     {
@@ -17,7 +19,7 @@
         public IActionResult Index()
         {
             var totalPets = this.data.Pets.Count();
-            var totalShelters = this.data.Shelters.Count();
+            var totalShelters = this.data.Shelters.Where(s => s.RegistrationStatus == Аccepted).Count();
 
             var result = new IndexViewModel
             {

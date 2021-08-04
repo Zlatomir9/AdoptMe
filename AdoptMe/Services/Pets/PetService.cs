@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using AutoMapper;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
@@ -13,10 +14,13 @@
     public class PetService : IPetService
     {
         private readonly AdoptMeDbContext data;
+        private readonly IMapper mapper;
 
-        public PetService(AdoptMeDbContext data)
-            => this.data = data;
-
+        public PetService(AdoptMeDbContext data, IMapper mapper)
+        {
+            this.data = data;
+            this.mapper = mapper;
+        }
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
         {
@@ -35,7 +39,7 @@
             var totalPets = petsQuery.Count();
 
             var pets = petsQuery
-                .Select(x => new PetViewModel
+                .Select(x => new PetDetailsViewModel
                 {
                     Id = x.Id,
                     Species = x.Species.ToString(),
@@ -79,8 +83,7 @@
                        ShelterPhoneNumber = p.Shelter.PhoneNumber,
                        ShelterEmail = p.Shelter.Email,
                        UserId = p.Shelter.UserId,
-                       SpeciesId = p.SpeciesId,
-                       DateAdded = DateTime.UtcNow
+                       SpeciesId = p.SpeciesId
                    })
                    .FirstOrDefault();
 
@@ -97,7 +100,8 @@
                 MyStory = myStory,
                 ImageUrl = imageUrl,
                 SpeciesId = speciesId,
-                ShelterId = shelterId
+                ShelterId = shelterId,
+                DateAdded = DateTime.UtcNow
             };
 
             this.data.Pets.Add(petData);

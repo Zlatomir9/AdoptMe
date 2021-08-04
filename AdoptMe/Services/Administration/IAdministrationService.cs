@@ -7,6 +7,6 @@
     {
         RegistrationRequestsViewModel RegistrationRequests(int pageIndex);
 
-        AllPetsViewModel AllPets(int pageIndex);
+        AllPetsViewModel AllPets(int pageIndex, string sortOrder);
     }
 }

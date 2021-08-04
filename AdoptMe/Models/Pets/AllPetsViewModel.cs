@@ -11,12 +11,14 @@
         [Display(Name = "Search by breed:")]
         public string SearchString { get; init; }
 
+        public string SortOrder { get; init; }
+
         public int PageIndex { get; init; } = 1;
 
         public int TotalPets { get; set; }
 
         public IEnumerable<PetSpeciesModel> AllSpecies { get; set; }
 
-        public IEnumerable<PetViewModel> Pets { get; set; }
+        public IEnumerable<PetDetailsViewModel> Pets { get; set; }
     }
 }

@@ -1,39 +1,50 @@
 ﻿@model AllPetsViewModel
 
-@{ ViewBag.Title = "All active pet adds"; }
+@{ ViewBag.Title = "All active pet adds";
+}
 
-<table class="table table-sm">
-    <thead>
+<table class="table">
+    <tr>
+        <th>
+            Image
+        </th>
+        <th>
+            Pet Name
+        </th>
+        <th>
+            @Html.ActionLink("Shelter Name", "AllPets", "AdminPanel", new { sortOrder = ViewBag.ShelterSortParm })
+        </th>
+        <th>
+            @Html.ActionLink("Date Added", "AllPets", "AdminPanel", new { sortOrder = ViewBag.DateSortParm })
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var pet in Model.Pets)
+    {
         <tr>
-            <th scope="col">Image</th>
-            <th scope="col">Name</th>
-            <th scope="col">Species</th>
-            <th scope="col">Breed</th>
-            <th scope="col">Actions</th>
+            <td>
+                <img class="align-self-start" src=@pet.ImageUrl alt="Generic placeholder image" style="width: 80px; height: 71px;">
+            </td>
+            <td>
+                @Html.DisplayFor(p => pet.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(p => pet.ShelterName)
+            </td>
+            <td>
+                @Html.DisplayFor(p => pet.DateAdded)
+            </td>
+            <td>
+                <a asp-area="" asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-dark">Details</a>
+            </td>
         </tr>
-    </thead>
-    <tbody>
-        @foreach (var pet in Model.Pets)
-        {
-            <tr>
-                <td>@pet.ImageUrl</td>
-                <td>@pet.Name</td>
-                <td>@pet.Species</td>
-                <td>@pet.Breed</td>
-                <td>
-                    <form method="post">
-                        <button type="submit" class="btn btn-success" asp-area="Administration" asp-controller="AdminPanel" asp-action="АcceptRequest" asp-route-id="@pet.Id">Accept</button>
-                        <button type="submit" class="btn btn-danger" asp-area="Administration" asp-controller="AdminPanel" asp-action="DeclineRequest" asp-route-id="@pet.Id">Decline</button>
-                    </form>
-                </td>
-            </tr>            
-         }
-    </tbody>
+}
 </table>
 
 @if (!Model.Pets.Any())
 {
-<h2 class="text-center">No pets found!</h2>
+    <h2 class="text-center">No pets found!</h2>
 }
 
 @{ var previousPage = Model.PageIndex - 1;
@@ -42,22 +53,25 @@
         previousPage = 1;
     }
 
-    var maxPage = Math.Ceiling(((double)Model.TotalPets) / AdminPanelPagesSize); }
+    var maxPage = Math.Ceiling(((double)Model.TotalPets) / AdminPanelPagesSize); 
+}
 
 <div class="row mb-5">
     <div class="col-md-6">
-        <a class="btn btn-primary @(Model.PageIndex == 1 ? "disabled" : string.Empty)"
+        <a class="btn btn-secondary @(Model.PageIndex == 1 ? "disabled" : string.Empty)"
            asp-controller="AdminPanel"
            asp-action="AllPets"
-           asp-route-pageIndex="@previousPage">Previous</a>
+           asp-route-pageIndex="@previousPage"
+           asp-route-sortOrder="@ViewBag.CurrentSort">Previous</a>
     </div>
 
     @{ var shouldButtonBeDisabled = Model.PageIndex == maxPage || !Model.Pets.Any(); }
 
     <div class="col-md-6">
-        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+        <a class="btn btn-secondary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
            asp-controller="AdminPanel"
            asp-action="AllPets"
-           asp-route-pageIndex="@(Model.PageIndex + 1)">Next</a>
+           asp-route-pageIndex="@(Model.PageIndex + 1)"
+           asp-route-sortOrder="@ViewBag.CurrentSort">Next</a>
     </div>
 </div>

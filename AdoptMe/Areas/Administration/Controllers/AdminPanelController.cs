@@ -1,5 +1,6 @@
 ﻿namespace AdoptMe.Areas.Administration.Controllers
 {
+    using System;
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using AdoptMe.Data;
@@ -27,8 +28,8 @@
             var queryResult = this.administration.RegistrationRequests(
                 query.PageIndex);
 
-            query.Shelters = queryResult.Shelters;
             query.TotalShelters = queryResult.TotalShelters;
+            query.Shelters = queryResult.Shelters;
 
             return View(query);
         }
@@ -67,10 +68,15 @@
             return this.RedirectToAction("ShelterRequests");
         }
 
-        public IActionResult AllPets(AllPetsViewModel query)
+        public IActionResult AllPets(AllPetsViewModel query, string sortOrder)
         {
+            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "Date" : "";
+            ViewBag.ShelterSortParm = sortOrder == "Shelter" ? "shelter_desc" : "Shelter";
+            ViewBag.CurrentSort = sortOrder;
+
             var queryResult = this.administration.AllPets(
-                query.PageIndex);
+                query.PageIndex, 
+                query.SortOrder);
 
             query.TotalPets = queryResult.TotalPets;
             query.Pets = queryResult.Pets;

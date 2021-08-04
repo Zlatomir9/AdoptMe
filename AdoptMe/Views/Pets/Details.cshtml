@@ -1,7 +1,9 @@
 ﻿@model PetDetailsViewModel
 
-@{
-    ViewBag.Title = "Pet info";
+@{ 
+   ViewBag.Title = "Pet info";
+   var userId = UserManager.GetUserId(this.User);
+   var shelterId = sheltersService.IdByUser(userId); 
 }
 
 <div class="container-fluid">
@@ -37,9 +39,18 @@
         </div>
 
         <div class="col-md-7">
-            <img src="@Model.ImageUrl" alt="image" width="630" height="450" class="rounded mb-4">
+            <img src="@Model.ImageUrl" alt="image" style="width: 646px; height: 517px;" class="rounded mb-4">
             <div class="text-center">
-                <a asp-controller="Adoptions" asp-action="Form" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a>
+
+                @if (!petsService.IsByShelter(Model.Id, shelterId) && !this.User.IsInRole(AdminRoleName))
+                {
+                    <a asp-controller="Adoptions" asp-action="Form" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a> 
+                }
+                else
+                {
+                    <a asp-controller="Pets" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">Edit</a>
+                    <a asp-controller="Pets" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                }
             </div>
         </div>
     </div>

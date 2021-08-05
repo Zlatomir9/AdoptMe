@@ -23,6 +23,8 @@
 
         public RegistrationStatus RegistrationStatus { get; set; }
 
+        public int AddressId { get; set; }
+
         [Required]
         public string UserId { get; set; }
 

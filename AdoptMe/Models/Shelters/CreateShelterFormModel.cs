@@ -13,5 +13,13 @@
         [Required]
         [StringLength(PhoneMaxLength, MinimumLength = PhoneMinLength)]
         public string PhoneNumber { get; set; }
+
+        [Required]
+        public string CityName { get; set; }
+
+        [Required]
+        public string StreetName { get; set; }
+
+        public string StreetNumber { get; set; }
     }
 }

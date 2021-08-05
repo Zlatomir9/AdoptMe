@@ -18,6 +18,10 @@
 
         public DbSet<Shelter> Shelters { get; init; }
 
+        public DbSet<City> Cities { get; init; }
+
+        public DbSet<Address> Addresses { get; init; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
@@ -39,6 +43,20 @@
                 .HasOne<IdentityUser>()
                 .WithOne()
                 .HasForeignKey<Shelter>(s => s.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<Address>()
+                .HasOne(a => a.City)
+                .WithMany(a => a.Addresses)
+                .HasForeignKey(a => a.CityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<Shelter>()
+                .HasOne<Address>()
+                .WithOne()
+                .HasForeignKey<Shelter>(a => a.AddressId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);

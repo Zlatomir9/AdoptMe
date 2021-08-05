@@ -48,7 +48,7 @@
 
             this.data.SaveChanges();
 
-            return this.RedirectToAction("ShelterRequests");
+            return this.RedirectToAction("RegistrationRequests");
         }
 
         [HttpPost]
@@ -65,7 +65,7 @@
 
             this.data.SaveChanges();
 
-            return this.RedirectToAction("ShelterRequests");
+            return this.RedirectToAction("RegistrationRequests");
         }
 
         public IActionResult AllPets(AllPetsViewModel query, string sortOrder)

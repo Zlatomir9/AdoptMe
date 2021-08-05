@@ -28,7 +28,16 @@
                     Id = x.Id,
                     Name = x.Name,
                     Email = x.Email,
-                    PhoneNumber = x.PhoneNumber
+                    PhoneNumber = x.PhoneNumber,
+                    Address = this.data.Addresses
+                                .Where(a => a.Id == x.AddressId)
+                                .Select(a => new AddressViewModel
+                                {
+                                    CityName = a.City.Name,
+                                    StreetName = a.StreetName,
+                                    StreetNumber = a.StreetNumber
+                                })
+                                .FirstOrDefault()
                 })
                 .Skip((pageIndex - 1) * AdminPanelPagesSize)
                 .Take(AdminPanelPagesSize)

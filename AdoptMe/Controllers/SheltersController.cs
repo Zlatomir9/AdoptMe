@@ -43,7 +43,10 @@
                 userId,
                 shelter.Name,
                 shelter.PhoneNumber,
-                shelterEmail);
+                shelterEmail,
+                shelter.CityName,
+                shelter.StreetName,
+                shelter.StreetNumber);
 
             return RedirectToAction("All", "Pets");
         }

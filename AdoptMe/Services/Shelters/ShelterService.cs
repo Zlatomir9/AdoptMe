@@ -12,14 +12,45 @@
         public ShelterService(AdoptMeDbContext data)
             => this.data = data;
 
-        public int Create(string userId, string name, string phoneNumber, string email)
+        public int Create(string userId, string name, string phoneNumber, 
+            string email, string cityName, string streetName, string streetNumber)
         {
+            var cityData = this.data.Cities.FirstOrDefault(c => c.Name == cityName);
+            var addressData = this.data.Addresses.FirstOrDefault(a => a.StreetName == streetName && a.StreetNumber == streetNumber);
+
+            if (cityData == null)
+            {
+                cityData = new City
+                {
+                    Name = cityName
+                };
+
+                this.data.Cities.Add(cityData);
+                this.data.SaveChanges();
+            }
+
+            if (addressData == null)
+            {
+                addressData = new Address
+                {
+                    StreetName = streetName,
+                    StreetNumber = streetNumber,
+                    CityId = cityData.Id
+                };
+
+                cityData.Addresses.Add(addressData);
+
+                this.data.Addresses.Add(addressData);
+                this.data.SaveChanges();
+            }
+
             var shelterData = new Shelter
             {
                 UserId = userId,
                 Name = name,
                 PhoneNumber = phoneNumber,
                 Email = email,
+                AddressId = addressData.Id,
                 RegistrationStatus = RegistrationStatus.Submitted
             };
 

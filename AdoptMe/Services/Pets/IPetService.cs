@@ -20,8 +20,6 @@
 
         IEnumerable<PetSpeciesModel> AllSpecies();
 
-        IEnumerable<PetDetailsViewModel> ByUser(string userId);
-
         bool IsByShelter(int petId, int shelterId);
 
         public bool SpeciesExists(int speciesId);

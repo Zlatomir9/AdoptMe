@@ -78,10 +78,11 @@
                 "name_desc" => petsQuery.OrderByDescending(p => p.Name),
                 _ => petsQuery.OrderByDescending(p => p.DateAdded),
             };
-
             
+            var userId = this.userService.GetUserId();
 
             var pets = petsQuery
+                .Where(x => x.Shelter.UserId == userId)
                 .Select(x => new PetDetailsViewModel
                 {
                     Id = x.Id,
@@ -94,9 +95,6 @@
                 .Skip((pageIndex - 1) * MyPetsPageSize)
                 .Take(MyPetsPageSize)
                 .ToList();
-
-            var userId = this.userService.GetUserId();
-            pets = ByUser(userId).ToList();
 
             return new AllPetsViewModel
             {
@@ -184,11 +182,6 @@
                    Name = c.Name
                })
                .ToList();
-
-        public IEnumerable<PetDetailsViewModel> ByUser(string userId)
-            => GetPets(this.data
-                .Pets
-                .Where(c => c.Shelter.UserId == userId));
 
         public bool IsByShelter(int petId, int shelterId)
             => this.data

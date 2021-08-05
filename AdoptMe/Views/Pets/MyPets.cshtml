@@ -18,20 +18,20 @@
 
     @foreach (var pet in Model.Pets)
     {
-<tr>
-    <td>
-        <img class="align-self-start" src=@pet.ImageUrl alt="Generic placeholder image" style="width: 80px; height: 71px;">
-    </td>
-    <td>
-        @Html.DisplayFor(p => pet.Name)
-    </td>
-    <td>
-        @Html.DisplayFor(p => pet.DateAdded)
-    </td>
-    <td>
-        <a asp-area="" asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-dark">Details</a>
-    </td>
-</tr>
+        <tr>
+            <td>
+                <img class="align-self-start" src=@pet.ImageUrl alt="Generic placeholder image" style="width: 80px; height: 71px;">
+            </td>
+            <td>
+                @Html.DisplayFor(p => pet.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(p => pet.DateAdded)
+            </td>
+            <td>
+                <a asp-area="" asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-dark">Details</a>
+            </td>
+        </tr>
 }
 </table>
 

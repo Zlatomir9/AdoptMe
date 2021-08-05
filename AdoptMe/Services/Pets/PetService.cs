@@ -8,18 +8,21 @@
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
+    using AdoptMe.Services.Users;
 
     using static Common.GlobalConstants.PageSizes;
 
     public class PetService : IPetService
     {
         private readonly AdoptMeDbContext data;
+        private readonly IUserService userService;
         private readonly IMapper mapper;
 
-        public PetService(AdoptMeDbContext data, IMapper mapper)
+        public PetService(AdoptMeDbContext data, IMapper mapper, IUserService userService)
         {
             this.data = data;
             this.mapper = mapper;
+            this.userService = userService;
         }
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
@@ -61,6 +64,44 @@
                 SearchString = searchString,
                 PageIndex = pageIndex,
                 TotalPets = totalPets
+            };
+        }
+
+        public AllPetsViewModel MyPets(int pageIndex, string sortOrder) 
+        {
+            var petsQuery = this.data.Pets.AsQueryable();
+
+            petsQuery = sortOrder switch
+            {
+                "Date" => petsQuery.OrderBy(p => p.DateAdded),
+                "Name" => petsQuery.OrderBy(p => p.Name),
+                "name_desc" => petsQuery.OrderByDescending(p => p.Name),
+                _ => petsQuery.OrderByDescending(p => p.DateAdded),
+            };
+
+            
+
+            var pets = petsQuery
+                .Select(x => new PetDetailsViewModel
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Species = x.Species.Name,
+                    Breed = x.Breed,
+                    ImageUrl = x.ImageUrl,
+                    DateAdded = x.DateAdded
+                })
+                .Skip((pageIndex - 1) * MyPetsPageSize)
+                .Take(MyPetsPageSize)
+                .ToList();
+
+            var userId = this.userService.GetUserId();
+            pets = ByUser(userId).ToList();
+
+            return new AllPetsViewModel
+            {
+                Pets = pets,
+                TotalPets = petsQuery.Count()
             };
         }
 
@@ -144,7 +185,7 @@
                })
                .ToList();
 
-        public IEnumerable<PetViewModel> ByUser(string userId)
+        public IEnumerable<PetDetailsViewModel> ByUser(string userId)
             => GetPets(this.data
                 .Pets
                 .Where(c => c.Shelter.UserId == userId));
@@ -159,9 +200,9 @@
                 .Species
                 .Any(c => c.Id == speciesId);
 
-        private static IEnumerable<PetViewModel> GetPets(IQueryable<Pet> petQuery)
+        private static IEnumerable<PetDetailsViewModel> GetPets(IQueryable<Pet> petQuery)
             => petQuery
-                .Select(c => new PetViewModel
+                .Select(c => new PetDetailsViewModel
                 {
                     Id = c.Id,
                     Name = c.Name,

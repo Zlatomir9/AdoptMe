@@ -5,6 +5,7 @@ namespace AdoptMe
     using AdoptMe.Services.Administration;
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
+    using AdoptMe.Services.Users;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
@@ -47,7 +48,8 @@ namespace AdoptMe
 
             services.AddTransient<IPetService, PetService>()
                     .AddTransient<IShelterService, ShelterService>()
-                    .AddTransient<IAdministrationService, AdministrationService>();
+                    .AddTransient<IAdministrationService, AdministrationService>()
+                    .AddTransient<IUserService, UserService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -7,6 +7,7 @@
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
+    using System;
 
     public class PetsController : Controller
     {
@@ -158,6 +159,23 @@
                 pet.SpeciesId);
 
             return RedirectToAction(nameof(All));
+        }
+
+        [Authorize]
+        public IActionResult MyPets(AllPetsViewModel query, string sortOrder)
+        {
+            ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "Date" : "";
+            ViewBag.NameSortParm = sortOrder == "Name" ? "name_desc" : "Name";
+            ViewBag.CurrentSort = sortOrder;
+
+            var queryResult = this.pets.MyPets(
+                query.PageIndex,
+                query.SortOrder);
+
+            query.TotalPets = queryResult.TotalPets;
+            query.Pets = queryResult.Pets;
+
+            return View(query);
         }
     }
 }

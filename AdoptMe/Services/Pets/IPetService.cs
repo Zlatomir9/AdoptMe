@@ -8,6 +8,8 @@
     {
         AllPetsViewModel All(string species, string searchString, int pageIndex);
 
+        AllPetsViewModel MyPets(int pageIndex, string sortOrder);
+
         PetDetailsViewModel Details(int id);
 
         int Add(string name, Age age, string breed, string color, Gender gender, string myStory, 
@@ -18,7 +20,7 @@
 
         IEnumerable<PetSpeciesModel> AllSpecies();
 
-        IEnumerable<PetViewModel> ByUser(string userId);
+        IEnumerable<PetDetailsViewModel> ByUser(string userId);
 
         bool IsByShelter(int petId, int shelterId);
 

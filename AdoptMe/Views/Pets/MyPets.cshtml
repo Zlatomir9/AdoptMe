@@ -1,0 +1,68 @@
+﻿@model AllPetsViewModel
+
+@{ ViewBag.Title = "My active pet adds"; }
+
+<table class="table">
+    <tr>
+        <th>
+            Image
+        </th>
+        <th>
+            @Html.ActionLink("Pet Name", "MyPets", "Pets", new { sortOrder = ViewBag.NameSortParm })
+        </th>
+        <th>
+            @Html.ActionLink("Date Added", "MyPets", "Pets", new { sortOrder = ViewBag.DateSortParm })
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var pet in Model.Pets)
+    {
+<tr>
+    <td>
+        <img class="align-self-start" src=@pet.ImageUrl alt="Generic placeholder image" style="width: 80px; height: 71px;">
+    </td>
+    <td>
+        @Html.DisplayFor(p => pet.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(p => pet.DateAdded)
+    </td>
+    <td>
+        <a asp-area="" asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-dark">Details</a>
+    </td>
+</tr>
+}
+</table>
+
+@if (!Model.Pets.Any())
+{
+<h2 class="text-center">No pets found!</h2>}
+
+@{ var previousPage = Model.PageIndex - 1;
+    if (previousPage < 1)
+    {
+        previousPage = 1;
+    }
+
+    var maxPage = Math.Ceiling(((double)Model.TotalPets) / MyPetsPageSize); }
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-secondary @(Model.PageIndex == 1 ? "disabled" : string.Empty)"
+           asp-controller="Pets"
+           asp-action="MyPets"
+           asp-route-pageIndex="@previousPage"
+           asp-route-sortOrder="@ViewBag.CurrentSort">Previous</a>
+    </div>
+
+    @{ var shouldButtonBeDisabled = Model.PageIndex == maxPage || !Model.Pets.Any(); }
+
+    <div class="col-md-6">
+        <a class="btn btn-secondary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Pets"
+           asp-action="MyPets"
+           asp-route-pageIndex="@(Model.PageIndex + 1)"
+           asp-route-sortOrder="@ViewBag.CurrentSort">Next</a>
+    </div>
+</div>

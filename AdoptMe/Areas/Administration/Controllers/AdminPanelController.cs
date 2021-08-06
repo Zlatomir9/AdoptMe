@@ -1,10 +1,7 @@
 ﻿namespace AdoptMe.Areas.Administration.Controllers
 {
     using System;
-    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
-    using AdoptMe.Data;
-    using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Services.Administration;
     using AdoptMe.Models.Pets;
@@ -13,13 +10,9 @@
     public class AdminPanelController : AdministrationController
     {
         private readonly IAdministrationService administration;
-        private readonly AdoptMeDbContext data;
 
-        public AdminPanelController(IAdministrationService administration, AdoptMeDbContext data)
-        {
-            this.administration = administration;
-            this.data = data;
-        }
+        public AdminPanelController(IAdministrationService administration)
+             => this.administration = administration;
 
         public IActionResult Index() => View();
 
@@ -37,16 +30,12 @@
         [HttpPost]
         public IActionResult АcceptRequest(int id)
         {
-            var shelter = this.GetShelterById(id);
-
-            if (shelter == null)
+            if (id == 0)
             {
                 return this.NotFound();
             }
 
-            shelter.RegistrationStatus = RegistrationStatus.Аccepted;
-
-            this.data.SaveChanges();
+            this.administration.AcceptRequest(id);
 
             return this.RedirectToAction("RegistrationRequests");
         }
@@ -54,16 +43,12 @@
         [HttpPost]
         public IActionResult DeclineRequest(int id)
         {
-            var shelter = this.GetShelterById(id);
-
-            if (shelter == null)
+            if (id == 0)
             {
                 return this.NotFound();
             }
 
-            shelter.RegistrationStatus = RegistrationStatus.Declined;
-
-            this.data.SaveChanges();
+            this.administration.DeclineRequest(id);
 
             return this.RedirectToAction("RegistrationRequests");
         }
@@ -83,11 +68,5 @@
 
             return View(query);
         }
-
-        public Shelter GetShelterById(int id)
-            => this.data
-                .Shelters
-                .Where(s => s.Id == id)
-                .FirstOrDefault();
     }
 }

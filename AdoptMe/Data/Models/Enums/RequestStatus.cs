@@ -1,6 +1,6 @@
 ﻿namespace AdoptMe.Data.Models.Enums
 {
-    public enum RegistrationStatus
+    public enum RequestStatus
     {
         Submitted = 1,
         Аccepted = 2,

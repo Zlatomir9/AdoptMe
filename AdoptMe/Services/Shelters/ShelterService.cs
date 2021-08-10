@@ -1,16 +1,24 @@
 ﻿namespace AdoptMe.Services.Shelters
 {
     using System.Linq;
+    using System.Threading.Tasks;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
+    using Microsoft.AspNetCore.Identity;
+
+    using static Common.GlobalConstants.Roles;
 
     public class ShelterService : IShelterService
     {
         private readonly AdoptMeDbContext data;
+        private readonly UserManager<IdentityUser> userManager;
 
-        public ShelterService(AdoptMeDbContext data)
-            => this.data = data;
+        public ShelterService(AdoptMeDbContext data, UserManager<IdentityUser> userManager)
+        {
+            this.data = data;
+            this.userManager = userManager;
+        }
 
         public int Create(string userId, string name, string phoneNumber, 
             string email, string cityName, string streetName, string streetNumber)
@@ -51,8 +59,17 @@
                 PhoneNumber = phoneNumber,
                 Email = email,
                 AddressId = addressData.Id,
-                RegistrationStatus = RegistrationStatus.Submitted
+                RegistrationStatus = RequestStatus.Submitted
             };
+
+            Task
+                .Run(async () =>
+                {
+                    var user = this.userManager.FindByIdAsync(shelterData.UserId).Result;
+                    await userManager.AddToRoleAsync(user, ShelterRoleName);
+                })
+                .GetAwaiter()
+                .GetResult();
 
             this.data.Shelters.Add(shelterData);
             this.data.SaveChanges();
@@ -77,16 +94,16 @@
         public bool IsShelter(string userId)
             => this.data
                    .Shelters
-                   .Any(s => s.UserId == userId && s.RegistrationStatus == RegistrationStatus.Аccepted);
+                   .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Аccepted);
 
         public bool RegistrationIsSubmitted(string userId)
             => this.data
                    .Shelters
-                   .Any(s => s.UserId == userId && s.RegistrationStatus == RegistrationStatus.Submitted);
+                   .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Submitted);
 
         public bool RegistrationIsDeclined(string userId)
             => this.data
                    .Shelters
-                   .Any(s => s.UserId == userId && s.RegistrationStatus == RegistrationStatus.Declined);
+                   .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Declined);
     }
 }

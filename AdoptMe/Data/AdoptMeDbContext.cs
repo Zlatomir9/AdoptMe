@@ -22,6 +22,10 @@
 
         public DbSet<Address> Addresses { get; init; }
 
+        public DbSet<Adopter> Adopters { get; init; }
+
+        public DbSet<AdoptionApplication> AdoptionApplications { get; init; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
@@ -57,6 +61,29 @@
                 .HasOne<Address>()
                 .WithOne()
                 .HasForeignKey<Shelter>(a => a.AddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<Adopter>()
+                .HasOne<IdentityUser>()
+                .WithOne()
+                .HasForeignKey<Adopter>(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AdoptionApplication>().HasKey(x => new { x.PetId, x.AdopterId });
+
+            modelBuilder
+                .Entity<AdoptionApplication>()
+                .HasOne(a => a.Adopter)
+                .WithMany(a => a.AdoptionApplications)
+                .HasForeignKey(a => a.AdopterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder
+                .Entity<AdoptionApplication>()
+                .HasOne(p => p.Pet)
+                .WithMany(p => p.AdoptionApplications)
+                .HasForeignKey(p => p.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(modelBuilder);

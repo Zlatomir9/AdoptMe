@@ -21,7 +21,7 @@
         [Required]
         public string Email { get; set; }
 
-        public RegistrationStatus RegistrationStatus { get; set; }
+        public RequestStatus RegistrationStatus { get; set; }
 
         public int AddressId { get; set; }
 

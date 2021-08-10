@@ -1,8 +1,9 @@
 ﻿namespace AdoptMe.Data.Models
 {
-    using AdoptMe.Data.Models.Enums;
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using AdoptMe.Data.Models.Enums;
 
     using static DataConstants.PetRequirements;
     
@@ -42,5 +43,7 @@
         public int ShelterId { get; init; }
 
         public Shelter Shelter { get; init; }
+
+        public IEnumerable<AdoptionApplication> AdoptionApplications { get; init; } = new List<AdoptionApplication>();
     }
 }

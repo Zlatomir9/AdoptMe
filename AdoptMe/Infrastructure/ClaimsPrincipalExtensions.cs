@@ -14,5 +14,8 @@
 
         public static bool IsAdmin(this ClaimsPrincipal user)
             => user.IsInRole(AdminRoleName);
+
+        public static bool IsShelter(this ClaimsPrincipal user)
+            => user.IsInRole(ShelterRoleName);
     }
 }

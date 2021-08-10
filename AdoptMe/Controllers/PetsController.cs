@@ -1,5 +1,6 @@
 ﻿namespace AdoptMe.Controllers
 {
+    using System;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using AutoMapper;
@@ -7,19 +8,21 @@
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
-    using System;
+    using AdoptMe.Services.Users;
 
     public class PetsController : Controller
     {
         private readonly IPetService pets;
         private readonly IShelterService shelters;
         private readonly IMapper mapper;
+        private readonly IUserService userService;
 
-        public PetsController(IPetService pets, IShelterService shelters, IMapper mapper)
+        public PetsController(IPetService pets, IShelterService shelters, IMapper mapper, IUserService userService)
         {
             this.pets = pets;
             this.shelters = shelters;
             this.mapper = mapper;
+            this.userService = userService;
         }
 
         public IActionResult All(AllPetsViewModel query)
@@ -48,7 +51,7 @@
         [Authorize]
         public IActionResult Add()
         {
-            if (!this.shelters.IsShelter(this.User.GetId()))
+            if (!User.IsShelter())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
@@ -101,7 +104,7 @@
         {
             var userId = this.User.GetId();
 
-            if (!this.shelters.IsShelter(userId) && !User.IsAdmin())
+            if (!User.IsShelter() && !User.IsAdmin())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }

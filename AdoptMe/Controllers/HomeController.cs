@@ -7,7 +7,7 @@
     using AdoptMe.Models;
     using AdoptMe.Models.Home;
 
-    using static Data.Models.Enums.RegistrationStatus;
+    using static Data.Models.Enums.RequestStatus;
 
     public class HomeController : Controller
     {

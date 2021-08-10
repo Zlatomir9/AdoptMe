@@ -1,8 +1,6 @@
 ﻿namespace AdoptMe.Services.Administration
 {
     using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity;
     using AdoptMe.Data;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Data.Models.Enums;
@@ -10,24 +8,19 @@
     using AdoptMe.Models.Pets;
 
     using static Common.GlobalConstants.PageSizes;
-    using static Common.GlobalConstants.Roles;
 
     public class AdministrationService : IAdministrationService
     {
         private readonly AdoptMeDbContext data;
-        private readonly UserManager<IdentityUser> userManager;
 
-        public AdministrationService(AdoptMeDbContext data, UserManager<IdentityUser> userManager)
-        {
-            this.data = data;
-            this.userManager = userManager;
-        }
+        public AdministrationService(AdoptMeDbContext data)
+           => this.data = data;
 
         public RegistrationRequestsViewModel RegistrationRequests(int pageIndex)
         {
             var sheltersQuery = this.data
                 .Shelters
-                .Where(s => s.RegistrationStatus == RegistrationStatus.Submitted)
+                .Where(s => s.RegistrationStatus == RequestStatus.Submitted)
                 .AsQueryable();
 
             var shelters = sheltersQuery
@@ -96,16 +89,7 @@
         {
             var shelter = this.GetShelterById(id);
 
-            shelter.RegistrationStatus = RegistrationStatus.Аccepted;
-
-            Task
-                .Run(async () =>
-                {
-                    var user = this.userManager.FindByIdAsync(shelter.UserId).Result;
-                    await userManager.AddToRoleAsync(user, ShelterRoleName);
-                })
-                .GetAwaiter()
-                .GetResult();
+            shelter.RegistrationStatus = RequestStatus.Аccepted;
 
             this.data.SaveChanges();
         }
@@ -114,7 +98,7 @@
         {
             var shelter = this.GetShelterById(id);
 
-            shelter.RegistrationStatus = RegistrationStatus.Declined;
+            shelter.RegistrationStatus = RequestStatus.Declined;
 
             this.data.SaveChanges();
         }

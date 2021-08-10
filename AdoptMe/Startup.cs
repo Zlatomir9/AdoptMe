@@ -3,6 +3,7 @@ namespace AdoptMe
     using AdoptMe.Data;
     using AdoptMe.Infrastructure;
     using AdoptMe.Services.Administration;
+    using AdoptMe.Services.Adoptions;
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
     using AdoptMe.Services.Users;
@@ -49,7 +50,8 @@ namespace AdoptMe
             services.AddTransient<IPetService, PetService>()
                     .AddTransient<IShelterService, ShelterService>()
                     .AddTransient<IAdministrationService, AdministrationService>()
-                    .AddTransient<IUserService, UserService>();
+                    .AddTransient<IUserService, UserService>()
+                    .AddTransient<IAdoptionService, AdoptionService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -2,7 +2,6 @@
 {
     using AutoMapper;
     using AdoptMe.Models.Pets;
-    using AdoptMe.Data.Models;
 
     public class MappingProfile : Profile
     {

@@ -44,7 +44,7 @@
 
                 @if (!petsService.IsByShelter(Model.Id, shelterId) && !this.User.IsInRole(AdminRoleName))
                 {
-                    <a asp-controller="Adoptions" asp-action="Form" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a> 
+                    <a asp-controller="Adoptions" asp-action="AdoptionApplication" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a> 
                 }
                 else
                 {

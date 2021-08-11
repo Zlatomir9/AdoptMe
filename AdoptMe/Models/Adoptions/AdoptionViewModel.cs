@@ -8,8 +8,10 @@
 
         public string AdopterFullName { get; init; }
 
-        public string PetName { get; set; }
+        public string PetName { get; init; }
 
         public DateTime SubmittedOn { get; init; }
+
+        public int PetId { get; init; }
     }
 }

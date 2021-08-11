@@ -72,7 +72,9 @@
                     Breed = x.Breed,
                     ImageUrl = x.ImageUrl,
                     DateAdded = x.DateAdded,
-                    ShelterName = x.Shelter.Name
+                    ShelterName = x.Shelter.Name,
+                    IsAdopted = x.IsAdopted,
+                    IsDeleted = x.IsDeleted
                 })
                 .Skip((pageIndex - 1) * AdminPanelPagesSize)
                 .Take(AdminPanelPagesSize)

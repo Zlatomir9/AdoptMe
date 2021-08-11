@@ -34,6 +34,8 @@
 
         public bool IsAdopted { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public DateTime DateAdded { get; set; }
 
         public int SpeciesId { get; set; }

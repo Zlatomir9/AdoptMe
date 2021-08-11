@@ -21,7 +21,7 @@
             this.data = data;
         }
 
-        public int CreateAdoption(string firstName, string lastName, int Age, string firstQuestion, 
+        public int CreateAdoption(string firstName, string lastName, int Age, string firstQuestion,
             string secondQuestion, string thirdQuestion, string fourthQuestion, int petId)
         {
             var userId = this.userService.GetUserId();
@@ -47,7 +47,7 @@
 
             var pet = this.data
                     .Pets
-                    .Where(x => x.Id == petId && 
+                    .Where(x => x.Id == petId &&
                            x.IsAdopted == false)
                     .FirstOrDefault();
 
@@ -71,18 +71,24 @@
 
         public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex)
         {
+            var userId = this.userService.GetUserId();
+
             var adoptionsQuery = this.data
                 .AdoptionApplications
-                .Where(s => s.RequestStatus == Submitted)
+                .Where(s => s.RequestStatus == Submitted && s.Pet.Shelter.UserId == userId)
                 .AsQueryable();
 
             var adoptions = adoptionsQuery
                 .Select(x => new AdoptionViewModel
                 {
+                    Id = x.Id,
                     AdopterFullName = x.Adopter.FirstName + " " + x.Adopter.LastName,
                     PetName = x.Pet.Name,
-                    SubmittedOn = x.SubmittedOn
+                    SubmittedOn = x.SubmittedOn,
+                    PetId = x.PetId
                 })
+                .OrderBy(x => x.PetName)
+                .ThenBy(x => x.SubmittedOn)
                 .Skip((pageIndex - 1) * AdoptionApplicationsPageSize)
                 .Take(AdoptionApplicationsPageSize)
                 .ToList();
@@ -94,10 +100,72 @@
             };
         }
 
+        public AdoptionDetailsViewModel Details(int id)
+            => this.data
+                   .AdoptionApplications
+                   .Where(a => a.Id == id)
+                   .Select(a => new AdoptionDetailsViewModel
+                   {
+                       Id = a.Id,
+                       AdopterFullName = a.Adopter.FirstName + " " + a.Adopter.LastName,
+                       AdopterAge = a.Adopter.Age,
+                       PetName = a.Pet.Name,
+                       SubmittedOn = a.SubmittedOn,
+                       FirstAnswer = a.FirstAnswer,
+                       SecondAnswer = a.SecondAnswer,
+                       ThirdAnswer = a.ThirdAnswer,
+                       FourthAnswer = a.FourthAnswer,
+                       PetId = a.PetId
+                   })
+                   .FirstOrDefault();
+
+        public void ApproveAdoption(int id)
+        {
+            var adoptionApplication = GetApplication(id);
+
+            adoptionApplication.RequestStatus = Аccepted;
+
+            var petData = this.data
+                    .Pets
+                    .FirstOrDefault(x => x.Id == adoptionApplication.PetId);
+            petData.IsAdopted = true;
+            petData.IsDeleted = true;
+
+            var submittedApplications = petData
+                .AdoptionApplications
+                .Where(x => x.RequestStatus == Submitted)
+                .ToList();
+
+            if (submittedApplications.Any())
+            {
+                foreach (var adoptionApplicaton in submittedApplications)
+                {
+                    adoptionApplication.RequestStatus = Declined;
+                }
+            }
+
+            this.data.SaveChanges();
+        }
+
+        public void DeclineAdoption(int id)
+        {
+            var adoptionApplication = GetApplication(id);
+
+            adoptionApplication.RequestStatus = Declined;
+
+            this.data.SaveChanges();
+        }
+
         public bool SentApplication(int id)
             => this.data
                 .AdoptionApplications
                 .Any(x => x.Adopter.UserId == userService.GetUserId() &&
-                    x.PetId == id);
+                          x.PetId == id);
+
+        public AdoptionApplication GetApplication(int id)
+            => this.data
+                    .AdoptionApplications
+                    .Where(x => x.Id == id)
+                    .FirstOrDefault();
     }
 }

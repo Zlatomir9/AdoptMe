@@ -1,0 +1,32 @@
+﻿@model AdoptionDetailsViewModel
+
+<div class="card w-75">
+    <div class="card-body">
+        <h5 class="card-title mb-4">Adoption application for @Model.PetName</h5>
+        <h5 class="card-subtitle mb-2">Sent from: @Model.AdopterFullName, @Model.AdopterAge years old, date: @Model.SubmittedOn.ToString("g")</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <label asp-for="FirstAnswer"></label>
+                <p>A: @Model.FirstAnswer</p>
+            </li>
+            <li class="list-group-item">
+                <label asp-for="SecondAnswer"></label>
+                <p>A: @Model.SecondAnswer</p>
+            </li>
+            <li class="list-group-item">
+                <label asp-for="ThirdAnswer"></label>
+                <p>A: @Model.ThirdAnswer</p>
+            </li>
+            <li class="list-group-item">
+                <label asp-for="FourthAnswer"></label>
+                <p>A: @Model.FourthAnswer</p>
+            </li>
+        </ul>
+        <div class="card-body">
+            <form method="post">
+                <button type="submit" class="btn btn-outline-info" asp-area="" asp-controller="Adoptions" asp-action="ApproveAdoption" asp-route-id="@Model.Id">Accept</button>
+                <button type="submit" class="btn btn-outline-warning" asp-area="" asp-controller="Adoptions" asp-action="DeclineAdoption" asp-route-id="@Model.Id">Decline</button>
+            </form>
+        </div>
+    </div>
+</div>

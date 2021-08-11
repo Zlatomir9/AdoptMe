@@ -18,13 +18,15 @@
 
         public IActionResult Index()
         {
-            var totalPets = this.data.Pets.Count();
+            var totalPets = this.data.Pets.Where(p => p.IsAdopted == false && p.IsDeleted == false).Count();
             var totalShelters = this.data.Shelters.Where(s => s.RegistrationStatus == Аccepted).Count();
+            var totalAdoptions = this.data.AdoptionApplications.Where(a => a.RequestStatus == Аccepted).Count();
 
             var result = new IndexViewModel
             {
                 TotalPets = totalPets,
-                TotalShelters = totalShelters
+                TotalShelters = totalShelters,
+                TotalAdoptions = totalAdoptions
             };
 
             return View(result);

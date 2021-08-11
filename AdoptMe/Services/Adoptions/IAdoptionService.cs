@@ -1,7 +1,8 @@
-﻿using AdoptMe.Models.Adoptions;
-
-namespace AdoptMe.Services.Adoptions
+﻿namespace AdoptMe.Services.Adoptions
 {
+    using AdoptMe.Data.Models;
+    using AdoptMe.Models.Adoptions;
+
     public interface IAdoptionService
     {
         int CreateAdoption(string firstName, string lastName, int Age,
@@ -9,6 +10,14 @@ namespace AdoptMe.Services.Adoptions
 
         public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex);
 
+        public AdoptionDetailsViewModel Details(int id);
+
+        public void ApproveAdoption(int id);
+
+        public void DeclineAdoption(int id);
+
         public bool SentApplication(int id);
+
+        public AdoptionApplication GetApplication(int id);
     }
 }

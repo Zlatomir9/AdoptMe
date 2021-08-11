@@ -23,5 +23,13 @@
             public const int MyPetsPageSize = 5;
             public const int AdoptionApplicationsPageSize = 10;
         }
+
+        public class AdoptionApplicationQuestions
+        {
+            public const string FirstQuestion = "Why do you want to adopt a pet?";
+            public const string SecondQuestion = "Do you live in a house with yard or in flat?";
+            public const string ThirdQuestion = "Have you had a pet before?";
+            public const string FourthQuestion = "Do you currently have any other pets?";
+        }
     }
 }

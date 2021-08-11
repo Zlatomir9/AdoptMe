@@ -8,9 +8,7 @@
         private readonly IHttpContextAccessor httpContextAccessor;
 
         public UserService(IHttpContextAccessor httpContextAccessor)
-        {
-            this.httpContextAccessor = httpContextAccessor;
-        }
+             => this.httpContextAccessor = httpContextAccessor;
 
         public string GetUserId()
             => httpContextAccessor.HttpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier);

@@ -4,6 +4,7 @@
 
     using static Data.DataConstants.AdopterRequirements;
     using static Data.DataConstants.AnswerRequirements;
+    using static Common.GlobalConstants;
 
     public class AdoptionFormModel
     {
@@ -22,22 +23,22 @@
 
         [Required]
         [MinLength(AnswerMinLength, ErrorMessage = AnswerLengthErrorMessage)]
-        [Display(Name = "Why do you want to adopt a pet?")]
+        [Display(Name = AdoptionApplicationQuestions.FirstQuestion)]
         public string FirstQuestion { get; set; }
 
         [Required]
         [MinLength(AnswerMinLength, ErrorMessage = AnswerLengthErrorMessage)]
-        [Display(Name = "Do you live in a house with yard or in flat?")]
+        [Display(Name = AdoptionApplicationQuestions.SecondQuestion)]
         public string SecondQuestion { get; set; }
 
         [Required]
         [MinLength(AnswerMinLength, ErrorMessage = AnswerLengthErrorMessage)]
-        [Display(Name = "Have you had a pet before?")]
+        [Display(Name = AdoptionApplicationQuestions.ThirdQuestion)]
         public string ThirdQuestion { get; set; }
 
         [Required]
         [MinLength(AnswerMinLength, ErrorMessage = AnswerLengthErrorMessage)]
-        [Display(Name = "Do you currently have any other pets?")]
+        [Display(Name = AdoptionApplicationQuestions.FourthQuestion)]
         public string FourthQuestion { get; set; }
     }
 }

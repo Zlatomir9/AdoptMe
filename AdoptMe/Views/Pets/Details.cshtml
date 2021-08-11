@@ -42,14 +42,28 @@
             <img src="@Model.ImageUrl" alt="image" style="width: 646px; height: 517px;" class="rounded mb-4">
             <div class="text-center">
 
-                @if (!petsService.IsByShelter(Model.Id, shelterId) && !this.User.IsInRole(AdminRoleName))
+                @if (!petsService.IsByShelter(Model.Id, shelterId) && 
+                    !this.User.IsInRole(AdminRoleName) &&
+                    Model.IsAdopted == false && 
+                    Model.IsDeleted == false)
                 {
                     <a asp-controller="Adoptions" asp-action="AdoptionApplication" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a> 
                 }
                 else
                 {
-                    <a asp-controller="Pets" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">Edit</a>
-                    <a asp-controller="Pets" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                    @if (Model.IsAdopted == true)
+                    {
+                        <p class="text-success">@Model.Name IS ALREADY ADOPTED</p>
+                    }
+                    else if (Model.IsDeleted == true)
+                    {
+                        <p class="text-danger">@Model.Name IS DELETED</p>
+                    }
+                    else
+                    { 
+                        <a asp-controller="Pets" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">Edit</a>
+                        <a asp-controller="Pets" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                    }
                 }
             </div>
         </div>

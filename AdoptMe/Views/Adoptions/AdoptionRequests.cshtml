@@ -18,9 +18,8 @@
             <td>@application.PetName</td>
             <td>@application.SubmittedOn</td>
             <td>
-                <form method="post">
-                    <button type="submit" class="btn btn-success" asp-area="Administration" asp-controller="AdminPanel" asp-action="АcceptRequest" asp-route-id="">Accept</button>
-                    <button type="submit" class="btn btn-danger" asp-area="Administration" asp-controller="AdminPanel" asp-action="DeclineRequest" asp-route-id="">Decline</button>
+                <form>
+                    <button type="submit" class="btn btn-success" asp-controller="Adoptions" asp-action="AdoptionApplicationDetails" asp-route-id="@application.Id">Details for request</button>
                 </form>
             </td>
         </tr>}
@@ -37,7 +36,7 @@
         previousPage = 1;
     }
 
-    var maxPage = Math.Ceiling(((double)Model.TotalAdoptionApplications) / AdminPanelPagesSize); }
+    var maxPage = Math.Ceiling(((double)Model.TotalAdoptionApplications) / AdoptionApplicationsPageSize); }
 
 <div class="row mb-5">
     <div class="col-md-6">

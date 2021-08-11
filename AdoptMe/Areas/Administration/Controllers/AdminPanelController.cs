@@ -37,7 +37,7 @@
 
             this.administration.AcceptRequest(id);
 
-            return this.RedirectToAction("RegistrationRequests");
+            return this.RedirectToAction(nameof(RegistrationRequests));
         }
 
         [HttpPost]
@@ -50,7 +50,7 @@
 
             this.administration.DeclineRequest(id);
 
-            return this.RedirectToAction("RegistrationRequests");
+            return this.RedirectToAction(nameof(RegistrationRequests));
         }
 
         public IActionResult AllPets(AllPetsViewModel query, string sortOrder)

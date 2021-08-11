@@ -42,6 +42,7 @@
             var totalPets = petsQuery.Count();
 
             var pets = petsQuery
+                .Where(p => p.IsAdopted == false && p.IsDeleted == false)
                 .Select(x => new PetDetailsViewModel
                 {
                     Id = x.Id,
@@ -91,7 +92,8 @@
                     Breed = x.Breed,
                     ImageUrl = x.ImageUrl,
                     DateAdded = x.DateAdded,
-                    IsAdopted = x.IsAdopted
+                    IsAdopted = x.IsAdopted,
+                    IsDeleted = x.IsDeleted
                 })
                 .Skip((pageIndex - 1) * MyPetsPageSize)
                 .Take(MyPetsPageSize)
@@ -123,7 +125,9 @@
                        ShelterPhoneNumber = p.Shelter.PhoneNumber,
                        ShelterEmail = p.Shelter.Email,
                        UserId = p.Shelter.UserId,
-                       SpeciesId = p.SpeciesId
+                       SpeciesId = p.SpeciesId,
+                       IsAdopted = p.IsAdopted,
+                       IsDeleted = p.IsDeleted
                    })
                    .FirstOrDefault();
 

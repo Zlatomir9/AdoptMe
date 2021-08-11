@@ -29,7 +29,18 @@
                 @Html.DisplayFor(p => pet.DateAdded)
             </td>
             <td>
+                @if (pet.IsAdopted == true)
+                {
+                    <p class="text-success">@pet.Name IS ALREDY ADOPTED</p>
+                }
+                else if (pet.IsDeleted == true)
+                {
+                    <p class="text-danger">@pet.Name IS DELETED</p>
+                }
+                else
+                {
                 <a asp-area="" asp-controller="Pets" asp-action="Details" asp-route-id="@pet.Id" type="button" class="btn btn-dark">Details</a>
+                }
             </td>
         </tr>
 }

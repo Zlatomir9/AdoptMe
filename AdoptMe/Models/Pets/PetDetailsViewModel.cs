@@ -17,5 +17,7 @@
         public string ShelterEmail { get; init; }
 
         public bool IsAdopted { get; init; }
+
+        public bool IsDeleted { get; init; }
     }
 }

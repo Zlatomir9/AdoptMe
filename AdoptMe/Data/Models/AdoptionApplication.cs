@@ -6,13 +6,7 @@
 
     public class AdoptionApplication
     {
-        public int PetId { get; set; }
-
-        public Pet Pet { get; set; }
-
-        public int AdopterId { get; set; }
-
-        public Adopter Adopter { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string FirstAnswer { get; set; }
@@ -29,5 +23,13 @@
         public RequestStatus RequestStatus { get; set; }
 
         public DateTime SubmittedOn { get; set; }
+
+        public int PetId { get; set; }
+
+        public Pet Pet { get; set; }
+
+        public int AdopterId { get; set; }
+
+        public Adopter Adopter { get; set; }
     }
 }

@@ -90,7 +90,8 @@
                     Species = x.Species.Name,
                     Breed = x.Breed,
                     ImageUrl = x.ImageUrl,
-                    DateAdded = x.DateAdded
+                    DateAdded = x.DateAdded,
+                    IsAdopted = x.IsAdopted
                 })
                 .Skip((pageIndex - 1) * MyPetsPageSize)
                 .Take(MyPetsPageSize)

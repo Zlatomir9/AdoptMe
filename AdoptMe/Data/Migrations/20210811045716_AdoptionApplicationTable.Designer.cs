@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AdoptMe.Data.Migrations
 {
     [DbContext(typeof(AdoptMeDbContext))]
-    [Migration("20210810183808_AdoptionApplicationTable")]
+    [Migration("20210811045716_AdoptionApplicationTable")]
     partial class AdoptionApplicationTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -79,8 +79,10 @@ namespace AdoptMe.Data.Migrations
 
             modelBuilder.Entity("AdoptMe.Data.Models.AdoptionApplication", b =>
                 {
-                    b.Property<int>("PetId")
-                        .HasColumnType("int");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("AdopterId")
                         .HasColumnType("int");
@@ -92,6 +94,9 @@ namespace AdoptMe.Data.Migrations
                     b.Property<string>("FourthAnswer")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PetId")
+                        .HasColumnType("int");
 
                     b.Property<int>("RequestStatus")
                         .HasColumnType("int");
@@ -107,9 +112,11 @@ namespace AdoptMe.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("PetId", "AdopterId");
+                    b.HasKey("Id");
 
                     b.HasIndex("AdopterId");
+
+                    b.HasIndex("PetId");
 
                     b.ToTable("AdoptionApplications");
                 });

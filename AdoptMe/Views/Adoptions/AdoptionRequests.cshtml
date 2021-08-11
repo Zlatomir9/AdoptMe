@@ -1,0 +1,58 @@
+﻿@model AdoptionApplicationsViewModel
+
+@{ ViewBag.Title = "All adoption requests"; }
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th scope="col">Adopter name</th>
+            <th scope="col">Pet name</th>
+            <th scope="col">Submitted on</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var application in Model.Adoptions)
+        {
+        <tr>
+            <td>@application.AdopterFullName</td>
+            <td>@application.PetName</td>
+            <td>@application.SubmittedOn</td>
+            <td>
+                <form method="post">
+                    <button type="submit" class="btn btn-success" asp-area="Administration" asp-controller="AdminPanel" asp-action="АcceptRequest" asp-route-id="">Accept</button>
+                    <button type="submit" class="btn btn-danger" asp-area="Administration" asp-controller="AdminPanel" asp-action="DeclineRequest" asp-route-id="">Decline</button>
+                </form>
+            </td>
+        </tr>}
+    </tbody>
+</table>
+
+@if (!Model.Adoptions.Any())
+{
+<h2 class="text-center">No applications found!</h2>}
+
+@{ var previousPage = Model.PageIndex - 1;
+    if (previousPage < 1)
+    {
+        previousPage = 1;
+    }
+
+    var maxPage = Math.Ceiling(((double)Model.TotalAdoptionApplications) / AdminPanelPagesSize); }
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.PageIndex == 1 ? "disabled" : string.Empty)"
+           asp-controller="AdminPanel"
+           asp-action="ShelterRequests"
+           asp-route-pageIndex="@previousPage">Previous</a>
+    </div>
+
+    @{ var shouldButtonBeDisabled = Model.PageIndex == maxPage || !Model.Adoptions.Any(); }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="AdminPanel"
+           asp-action="ShelterRequests"
+           asp-route-pageIndex="@(Model.PageIndex + 1)">Next</a>
+    </div>
+</div>

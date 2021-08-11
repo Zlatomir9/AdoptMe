@@ -5,6 +5,7 @@
     using AdoptMe.Models.Pets;
     using AdoptMe.Infrastructure;
     using AdoptMe.Services.Adoptions;
+    using AdoptMe.Models.Adoptions;
 
     public class AdoptionsController : Controller
     {
@@ -49,6 +50,18 @@
                 id);
 
             return RedirectToAction("All", "Pets");
+        }
+
+        [Authorize]
+        public IActionResult AdoptionRequests(AdoptionApplicationsViewModel query)
+        {
+            var queryResult = this.adoptions.AdoptionApplications(
+                query.PageIndex);
+
+            query.TotalAdoptionApplications = queryResult.TotalAdoptionApplications;
+            query.Adoptions = queryResult.Adoptions;
+
+            return View(query);
         }
     }
 }

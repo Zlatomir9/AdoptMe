@@ -70,8 +70,6 @@
                 .HasForeignKey<Adopter>(a => a.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<AdoptionApplication>().HasKey(x => new { x.PetId, x.AdopterId });
-
             modelBuilder
                 .Entity<AdoptionApplication>()
                 .HasOne(a => a.Adopter)

@@ -33,18 +33,20 @@ namespace AdoptMe.Data.Migrations
                 name: "AdoptionApplications",
                 columns: table => new
                 {
-                    PetId = table.Column<int>(type: "int", nullable: false),
-                    AdopterId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     FirstAnswer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SecondAnswer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ThirdAnswer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FourthAnswer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RequestStatus = table.Column<int>(type: "int", nullable: false),
-                    SubmittedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    SubmittedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PetId = table.Column<int>(type: "int", nullable: false),
+                    AdopterId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AdoptionApplications", x => new { x.PetId, x.AdopterId });
+                    table.PrimaryKey("PK_AdoptionApplications", x => x.Id);
                     table.ForeignKey(
                         name: "FK_AdoptionApplications_Adopters_AdopterId",
                         column: x => x.AdopterId,
@@ -69,6 +71,11 @@ namespace AdoptMe.Data.Migrations
                 name: "IX_AdoptionApplications_AdopterId",
                 table: "AdoptionApplications",
                 column: "AdopterId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdoptionApplications_PetId",
+                table: "AdoptionApplications",
+                column: "PetId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

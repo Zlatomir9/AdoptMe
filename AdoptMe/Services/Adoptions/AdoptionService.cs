@@ -4,9 +4,11 @@
     using System.Linq;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
+    using AdoptMe.Models.Adoptions;
     using AdoptMe.Services.Users;
 
     using static Data.Models.Enums.RequestStatus;
+    using static Common.GlobalConstants.PageSizes;
 
     public class AdoptionService : IAdoptionService
     {
@@ -65,6 +67,31 @@
             this.data.SaveChanges();
 
             return adoptionData.PetId;
+        }
+
+        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex)
+        {
+            var adoptionsQuery = this.data
+                .AdoptionApplications
+                .Where(s => s.RequestStatus == Submitted)
+                .AsQueryable();
+
+            var adoptions = adoptionsQuery
+                .Select(x => new AdoptionViewModel
+                {
+                    AdopterFullName = x.Adopter.FirstName + " " + x.Adopter.LastName,
+                    PetName = x.Pet.Name,
+                    SubmittedOn = x.SubmittedOn
+                })
+                .Skip((pageIndex - 1) * AdoptionApplicationsPageSize)
+                .Take(AdoptionApplicationsPageSize)
+                .ToList();
+
+            return new AdoptionApplicationsViewModel
+            {
+                Adoptions = adoptions,
+                TotalAdoptionApplications = adoptionsQuery.Count()
+            };
         }
 
         public bool SentApplication(int id)

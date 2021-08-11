@@ -21,6 +21,7 @@
             public const int AllPetsPageSize = 3;
             public const int AdminPanelPagesSize = 5;
             public const int MyPetsPageSize = 5;
+            public const int AdoptionApplicationsPageSize = 10;
         }
     }
 }

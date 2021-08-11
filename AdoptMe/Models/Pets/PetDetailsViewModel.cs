@@ -15,5 +15,7 @@
         public string ShelterPhoneNumber { get; init; }
 
         public string ShelterEmail { get; init; }
+
+        public bool IsAdopted { get; init; }
     }
 }

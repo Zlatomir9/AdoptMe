@@ -1,8 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
-
-namespace AdoptMe.Data.Migrations
+﻿namespace AdoptMe.Data.Migrations
 {
+    using System;
+    using Microsoft.EntityFrameworkCore.Migrations;
+
     public partial class AdoptionApplicationTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)

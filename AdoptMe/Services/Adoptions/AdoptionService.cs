@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Collections.Generic;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Adoptions;
@@ -128,13 +129,10 @@
             var petData = this.data
                     .Pets
                     .FirstOrDefault(x => x.Id == adoptionApplication.PetId);
-            petData.IsAdopted = true;
-            petData.IsDeleted = true;
 
-            var submittedApplications = petData
-                .AdoptionApplications
-                .Where(x => x.RequestStatus == Submitted)
-                .ToList();
+            petData.IsAdopted = true;
+
+            var submittedApplications = SubmittedPetAdoptionApplications(id);
 
             if (submittedApplications.Any())
             {
@@ -167,5 +165,11 @@
                     .AdoptionApplications
                     .Where(x => x.Id == id)
                     .FirstOrDefault();
+
+        public IEnumerable<AdoptionApplication> SubmittedPetAdoptionApplications(int id)
+            => this.data
+                .AdoptionApplications
+                .Where(x => x.Id == id && x.RequestStatus == Submitted)
+                .ToList();
     }
 }

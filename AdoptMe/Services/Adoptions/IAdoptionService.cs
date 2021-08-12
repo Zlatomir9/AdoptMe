@@ -1,5 +1,6 @@
 ﻿namespace AdoptMe.Services.Adoptions
 {
+    using System.Collections.Generic;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Adoptions;
 
@@ -19,5 +20,7 @@
         public bool SentApplication(int id);
 
         public AdoptionApplication GetApplication(int id);
+
+        public IEnumerable<AdoptionApplication> SubmittedPetAdoptionApplications(int id);
     }
 }

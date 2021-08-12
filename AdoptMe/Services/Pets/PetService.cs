@@ -9,6 +9,7 @@
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Users;
+    using AdoptMe.Services.Adoptions;
 
     using static Common.GlobalConstants.PageSizes;
 
@@ -16,13 +17,16 @@
     {
         private readonly AdoptMeDbContext data;
         private readonly IUserService userService;
+        private readonly IAdoptionService adoptionService;
         private readonly IMapper mapper;
 
-        public PetService(AdoptMeDbContext data, IMapper mapper, IUserService userService)
+        public PetService(AdoptMeDbContext data, IMapper mapper, 
+            IUserService userService, IAdoptionService adoptionService)
         {
             this.data = data;
             this.mapper = mapper;
             this.userService = userService;
+            this.adoptionService = adoptionService;
         }
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
@@ -176,6 +180,27 @@
             this.data.SaveChanges();
 
             return true;
+        }
+
+        public void Delete(int id)
+        {
+            var petData = this.data
+                    .Pets
+                    .FirstOrDefault(x => x.Id == id);
+
+            petData.IsDeleted = true;
+
+            var petAdoptionApplications = this.adoptionService.SubmittedPetAdoptionApplications(id);
+
+            if (petData.AdoptionApplications.Any())
+            {
+                foreach (var application in petAdoptionApplications)
+                {
+                    application.RequestStatus = RequestStatus.Declined;
+                }
+            }
+
+            this.data.SaveChanges();
         }
 
         public IEnumerable<PetSpeciesModel> AllSpecies()

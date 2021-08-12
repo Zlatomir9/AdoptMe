@@ -164,6 +164,27 @@
             return RedirectToAction(nameof(All));
         }
 
+        [HttpPost]
+        [Authorize]
+        public IActionResult Delete(int id)
+        {
+            var shelterId = this.shelters.IdByUser(this.User.GetId());
+
+            if (shelterId == 0)
+            {
+                return RedirectToAction(nameof(SheltersController.Create), "Shelters");
+            }
+
+            if (!this.pets.IsByShelter(id, shelterId))
+            {
+                return BadRequest();
+            }
+
+            this.pets.Delete(id);
+
+            return RedirectToAction(nameof(All));
+        }
+
         [Authorize]
         public IActionResult MyPets(AllPetsViewModel query, string sortOrder)
         {

@@ -1,6 +1,6 @@
 ﻿namespace AdoptMe.Models.Home
 {
-    public class IndexViewModel
+    public class StatisticsViewModel
     {
         public int TotalPets { get; init; }
 

@@ -17,6 +17,7 @@ namespace AdoptMe
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
     using AdoptMe.Services.Users;
+    using AdoptMe.Services.Statistics;
 
     public class Startup
     {
@@ -55,7 +56,8 @@ namespace AdoptMe
                     .AddTransient<IAdministrationService, AdministrationService>()
                     .AddTransient<IUserService, UserService>()
                     .AddTransient<IAdoptionService, AdoptionService>()
-                    .AddTransient<INotificationService, NotificationService>();
+                    .AddTransient<INotificationService, NotificationService>()
+                    .AddTransient<IStatisticsService, StatisticsService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

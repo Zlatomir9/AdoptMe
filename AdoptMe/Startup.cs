@@ -1,12 +1,5 @@
 namespace AdoptMe
 {
-    using AdoptMe.Data;
-    using AdoptMe.Infrastructure;
-    using AdoptMe.Services.Administration;
-    using AdoptMe.Services.Adoptions;
-    using AdoptMe.Services.Pets;
-    using AdoptMe.Services.Shelters;
-    using AdoptMe.Services.Users;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
@@ -15,6 +8,15 @@ namespace AdoptMe
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
+    using AdoptMe.Data;
+    using AdoptMe.Data.Models;
+    using AdoptMe.Infrastructure;
+    using AdoptMe.Services.Administration;
+    using AdoptMe.Services.Adoptions;
+    using AdoptMe.Services.Notifications;
+    using AdoptMe.Services.Pets;
+    using AdoptMe.Services.Shelters;
+    using AdoptMe.Services.Users;
 
     public class Startup
     {
@@ -26,11 +28,12 @@ namespace AdoptMe
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDbContext<AdoptMeDbContext>(options =>options
-                    .UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
+                .AddDbContext<AdoptMeDbContext>(options => 
+                    options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")),
+                    ServiceLifetime.Transient);
 
             services
-                .AddDefaultIdentity<IdentityUser>(options =>
+                .AddDefaultIdentity<User>(options =>
                     {
                         options.Password.RequireDigit = false;
                         options.Password.RequireLowercase = false;
@@ -51,7 +54,8 @@ namespace AdoptMe
                     .AddTransient<IShelterService, ShelterService>()
                     .AddTransient<IAdministrationService, AdministrationService>()
                     .AddTransient<IUserService, UserService>()
-                    .AddTransient<IAdoptionService, AdoptionService>();
+                    .AddTransient<IAdoptionService, AdoptionService>()
+                    .AddTransient<INotificationService, NotificationService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

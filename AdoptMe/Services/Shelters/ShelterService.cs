@@ -12,9 +12,9 @@
     public class ShelterService : IShelterService
     {
         private readonly AdoptMeDbContext data;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly UserManager<User> userManager;
 
-        public ShelterService(AdoptMeDbContext data, UserManager<IdentityUser> userManager)
+        public ShelterService(AdoptMeDbContext data, UserManager<User> userManager)
         {
             this.data = data;
             this.userManager = userManager;

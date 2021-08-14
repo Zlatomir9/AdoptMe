@@ -14,10 +14,13 @@
     {
         private readonly IPetService pets;
         private readonly IShelterService shelters;
-        private readonly IMapper mapper;
         private readonly IUserService userService;
+        private readonly IMapper mapper;
 
-        public PetsController(IPetService pets, IShelterService shelters, IMapper mapper, IUserService userService)
+        public PetsController(IPetService pets, 
+            IShelterService shelters, 
+            IUserService userService,
+            IMapper mapper)
         {
             this.pets = pets;
             this.shelters = shelters;
@@ -128,7 +131,7 @@
         {
             var shelterId = this.shelters.IdByUser(this.User.GetId());
 
-            if (shelterId == 0)
+            if (shelterId == 0 && !userService.UserIsAdmin())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
@@ -145,7 +148,7 @@
                 return View(pet);
             }
 
-            if (!this.pets.IsByShelter(id, shelterId))
+            if (!this.pets.IsByShelter(id, shelterId) && !userService.UserIsAdmin())
             {
                 return BadRequest();
             }
@@ -170,12 +173,12 @@
         {
             var shelterId = this.shelters.IdByUser(this.User.GetId());
 
-            if (shelterId == 0)
+            if (shelterId == 0 && !User.IsAdmin())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
 
-            if (!this.pets.IsByShelter(id, shelterId))
+            if (!this.pets.IsByShelter(id, shelterId) && !User.IsAdmin())
             {
                 return BadRequest();
             }

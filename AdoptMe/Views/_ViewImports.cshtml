@@ -4,14 +4,16 @@
 @using AdoptMe.Models.Home
 @using AdoptMe.Models.Adoptions
 @using AdoptMe.Data.Models.Enums
+@using AdoptMe.Data.Models
 @using AdoptMe.Models.Shelters
+@using AdoptMe.Models.Notifications
 @using AdoptMe.Services.Pets
 @using AdoptMe.Services.Shelters
 @using static AdoptMe.Common.GlobalConstants.Roles
 @using static AdoptMe.Common.GlobalConstants.PageSizes
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 @inject IShelterService sheltersService
 @inject IPetService petsService
 

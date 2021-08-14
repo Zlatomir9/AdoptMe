@@ -12,21 +12,27 @@
     using AdoptMe.Services.Adoptions;
 
     using static Common.GlobalConstants.PageSizes;
+    using AdoptMe.Services.Notifications;
 
     public class PetService : IPetService
     {
         private readonly AdoptMeDbContext data;
         private readonly IUserService userService;
         private readonly IAdoptionService adoptionService;
+        private readonly INotificationService notificationService;
         private readonly IMapper mapper;
 
-        public PetService(AdoptMeDbContext data, IMapper mapper, 
-            IUserService userService, IAdoptionService adoptionService)
+        public PetService(AdoptMeDbContext data, 
+            IMapper mapper,
+            IUserService userService, 
+            IAdoptionService adoptionService, 
+            INotificationService notificationService)
         {
             this.data = data;
             this.mapper = mapper;
             this.userService = userService;
             this.adoptionService = adoptionService;
+            this.notificationService = notificationService;
         }
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
@@ -161,7 +167,7 @@
         public bool Edit(int id, string name, Age age, string breed, string color, Gender gender,
                     string myStory, string imageUrl, int speciesId)
         {
-            var petData = this.data.Pets.Find(id);
+            var petData = this.data.Pets.FirstOrDefault(x => x.Id == id);
 
             if (petData == null)
             {
@@ -177,6 +183,13 @@
             petData.ImageUrl = imageUrl;
             petData.SpeciesId = speciesId;
 
+            var shelterData = this.data.Shelters.FirstOrDefault(x => x.Id == petData.ShelterId);
+
+            if (userService.UserIsAdmin())
+            {
+                PetEditByAdminNotification(petData.Name, shelterData.UserId);
+            }
+
             this.data.SaveChanges();
 
             return true;
@@ -188,7 +201,18 @@
                     .Pets
                     .FirstOrDefault(x => x.Id == id);
 
+            var shelterData = this.data
+                    .Shelters
+                    .FirstOrDefault(x => x.Id == petData.ShelterId);
+
             petData.IsDeleted = true;
+
+            if (userService.UserIsAdmin())
+            {
+                PetDeletedByAdminNotification(petData.Name, shelterData.UserId);
+            }
+
+            this.data.SaveChanges();
 
             var petAdoptionApplications = this.adoptionService.SubmittedPetAdoptionApplications(id);
 
@@ -197,10 +221,32 @@
                 foreach (var application in petAdoptionApplications)
                 {
                     application.RequestStatus = RequestStatus.Declined;
-                }
-            }
+                    var adopter = adoptionService.GetAdopter(application.AdopterId);
+                    adoptionService.DeclinedAdoptionNotification(petData.Name, adopter.UserId);
 
-            this.data.SaveChanges();
+                    this.data.SaveChanges();
+                }
+            }            
+        }
+
+        public void PetEditByAdminNotification(string petName, string userId)
+        {
+            var message = $"Your advertisment about {petName} has been edited by administrator.";
+
+            var notification = this.notificationService.Create(message);
+
+            this.notificationService
+                .AddNotificationToUser(notification.Id, userId);
+        }
+
+        public void PetDeletedByAdminNotification(string petName, string userId)
+        {
+            var message = $"Your advertisment about {petName} has been deleted by administrator.";
+
+            var notification = this.notificationService.Create(message);
+
+            this.notificationService
+                .AddNotificationToUser(notification.Id, userId);
         }
 
         public IEnumerable<PetSpeciesModel> AllSpecies()

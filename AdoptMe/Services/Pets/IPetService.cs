@@ -25,5 +25,9 @@
         bool IsByShelter(int petId, int shelterId);
 
         public bool SpeciesExists(int speciesId);
+
+        public void PetEditByAdminNotification(string petName, string userId);
+
+        public void PetDeletedByAdminNotification(string petName, string userId);
     }
 }

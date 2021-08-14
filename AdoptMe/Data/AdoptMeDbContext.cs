@@ -26,6 +26,10 @@
 
         public DbSet<AdoptionApplication> AdoptionApplications { get; init; }
 
+        public DbSet<Notification> Notifications { get; init; }
+
+        public DbSet<UserNotification> UserNotifications { get; init; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
@@ -44,7 +48,7 @@
 
             modelBuilder
                 .Entity<Shelter>()
-                .HasOne<IdentityUser>()
+                .HasOne<User>()
                 .WithOne()
                 .HasForeignKey<Shelter>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -65,7 +69,7 @@
 
             modelBuilder
                 .Entity<Adopter>()
-                .HasOne<IdentityUser>()
+                .HasOne<User>()
                 .WithOne()
                 .HasForeignKey<Adopter>(a => a.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
@@ -83,6 +87,9 @@
                 .WithMany(p => p.AdoptionApplications)
                 .HasForeignKey(p => p.PetId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<UserNotification>()
+                    .HasKey(x => new { x.NotificationId, x.UserId });
 
             base.OnModelCreating(modelBuilder);
         }

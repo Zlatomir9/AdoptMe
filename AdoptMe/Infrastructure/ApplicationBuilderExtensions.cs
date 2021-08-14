@@ -74,13 +74,13 @@
 
         private static void SeedAdministrator(IServiceProvider services)
         {
-            var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+            var userManager = services.GetRequiredService<UserManager<User>>();
 
 
             Task
                 .Run(async () =>
                 {
-                    var user = new IdentityUser
+                    var user = new User
                     {
                         Email = AdminEmail,
                         UserName = AdminUsername

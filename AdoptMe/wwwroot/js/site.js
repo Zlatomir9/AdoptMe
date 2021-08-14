@@ -1,4 +1,19 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿$(function () {
+    $('[data-toogle="tooltip"]').tooltip();
 
-// Write your JavaScript code.
+    function getNotifications(){
+        $.ajax({
+            url: "/Notifications/getNotifications",
+            method: "GET",
+            success: function(result){
+                $("#notificationsCount").html(result.count);
+                console.log(result);
+            },
+            error: function(error){
+                console.log(error);
+            }
+        });
+    }
+
+    getNotifications();
+});

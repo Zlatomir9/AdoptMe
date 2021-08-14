@@ -1,0 +1,56 @@
+﻿@model List<NotificationViewModel>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="container-fluid margin-top-4rem">
+    <div class="row">
+        <div class="col-md-8 mx-auto mb-100">
+            @if (!Model.Any())
+            {
+                <h5 class="text-center margin-bottom-4rem margin-top-4rem">You have no new notifications.</h5>
+            }
+            else
+            {
+                <h4 class="text-center margin-top-4rem margin-bottom-2rem">My Notifications</h4>
+
+                <table class="table">
+                    <tr>
+                        <th>
+                            Sent on
+                        </th>
+                        <th>
+                            Message
+                        </th>
+                        <th>
+                        </th>
+                    </tr>
+                    <tbody>
+                        @for (var i = 0; i < Model.Count(); i++)
+                        {
+                             <tr>
+                                 <td>
+                                     @Model[i].CreatedOn.ToString("g")
+                                 </td>
+                                 <td>
+                                     @Model[i].Message
+                                 </td>
+                                 <td>
+                                     <form method="post">
+                                         <button type="submit" class="btn btn-success"
+                                                 asp-controller="Notifications"
+                                                 asp-action="ReadNotification"
+                                                 asp-route-notificationId="@Model[i].Id">
+                                             Mark as read
+                                         </button>
+                                     </form>
+                                 </td>
+                             </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>

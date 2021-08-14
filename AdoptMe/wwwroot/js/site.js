@@ -5,8 +5,14 @@
         $.ajax({
             url: "/Notifications/getNotifications",
             method: "GET",
-            success: function(result){
-                $("#notificationsCount").html(result.count);
+            success: function (result) {
+
+                if (result.count != 0) {
+                    $("#notificationsCount").html(result.count);
+                }
+                else {
+                    $("#notificationsCount").html();
+                }
                 console.log(result);
             },
             error: function(error){

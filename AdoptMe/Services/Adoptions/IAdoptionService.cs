@@ -27,6 +27,8 @@
 
         public void DeclinedAdoptionNotification(string petName, string userId);
 
+        public void SentAdoptionNotification(string petName, string userId);
+
         public Adopter GetAdopter(int id);
     }
 }

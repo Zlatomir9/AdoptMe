@@ -55,6 +55,10 @@
                            x.IsAdopted == false)
                     .FirstOrDefault();
 
+            var shelter = this.data
+                    .Shelters
+                    .FirstOrDefault(x => x.Id == pet.ShelterId);
+
             var adoptionData = new AdoptionApplication
             {
                 AdopterId = adopter.Id,
@@ -66,6 +70,8 @@
                 FourthAnswer = firstQuestion,
                 SubmittedOn = DateTime.UtcNow
             };
+
+            SentAdoptionNotification(pet.Name, shelter.UserId);
 
             this.data.AdoptionApplications.Add(adoptionData);
             this.data.SaveChanges();
@@ -160,11 +166,15 @@
         {
             var adoptionApplication = GetApplication(id);
 
+            var petData = this.data
+                    .Pets
+                    .FirstOrDefault(x => x.Id == adoptionApplication.PetId);
+
             adoptionApplication.RequestStatus = Declined;
 
             var adopterData = GetAdopter(adoptionApplication.AdopterId);
 
-            DeclinedAdoptionNotification(adoptionApplication.Pet.Name, adopterData.UserId);
+            DeclinedAdoptionNotification(petData.Name, adopterData.UserId);
 
             this.data.SaveChanges();
         }
@@ -182,6 +192,16 @@
         public void DeclinedAdoptionNotification(string petName, string userId)
         {
             var message = $"Your application for adopting {petName} has been declined.";
+
+            var notification = this.notificationService.Create(message);
+
+            this.notificationService
+                .AddNotificationToUser(notification.Id, userId);
+        }
+
+        public void SentAdoptionNotification(string petName, string userId)
+        {
+            var message = $"You received new adoption application for {petName}.";
 
             var notification = this.notificationService.Create(message);
 

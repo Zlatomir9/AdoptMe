@@ -37,7 +37,10 @@
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
         {
-            var petsQuery = this.data.Pets.AsQueryable();
+            var petsQuery = this.data
+                    .Pets
+                    .Where(p => p.IsAdopted == false && p.IsDeleted == false)
+                    .AsQueryable();
 
             if (!string.IsNullOrEmpty(species))
             {
@@ -52,7 +55,6 @@
             var totalPets = petsQuery.Count();
 
             var pets = petsQuery
-                .Where(p => p.IsAdopted == false && p.IsDeleted == false)
                 .Select(x => new PetDetailsViewModel
                 {
                     Id = x.Id,

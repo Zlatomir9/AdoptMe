@@ -24,6 +24,7 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" 
+                                   asp-area=""
                                    asp-controller="Pets" 
                                    asp-action="Add" 
                                    data-toggle="tooltip" 
@@ -31,14 +32,15 @@
                                    title="Add Pet">Add Pet</a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-controller="Pets"
-                               asp-action="All"
-                               data-toggle="tooltip"
-                               data-placement="bottom"
-                               title="All Pet Adds">All Pets</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Pets"
+                                   asp-action="All"
+                                   data-toggle="tooltip"
+                                   data-placement="bottom"
+                                   title="All Pet Adds">All Pets</a>
+                            </li>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

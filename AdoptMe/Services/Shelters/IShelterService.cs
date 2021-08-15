@@ -8,8 +8,6 @@
 
         public bool RegistrationIsSubmitted(string userId);
 
-        public bool RegistrationIsDeclined(string userId);
-
         public int IdByUser(string userId);
 
         public string EmailByUser(string userId);

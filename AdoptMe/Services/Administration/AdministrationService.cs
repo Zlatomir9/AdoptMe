@@ -1,20 +1,32 @@
 ﻿namespace AdoptMe.Services.Administration
 {
     using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Identity;
     using AdoptMe.Data;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Pets;
+    using AdoptMe.Services.Notifications;
 
     using static Common.GlobalConstants.PageSizes;
+    using static Common.GlobalConstants.Roles;
 
     public class AdministrationService : IAdministrationService
     {
         private readonly AdoptMeDbContext data;
+        private readonly UserManager<User> userManager;
+        private readonly INotificationService notificationService;
 
-        public AdministrationService(AdoptMeDbContext data)
-           => this.data = data;
+        public AdministrationService(AdoptMeDbContext data, 
+            INotificationService notificationService, 
+            UserManager<User> userManager)
+        {
+            this.data = data;
+            this.notificationService = notificationService;
+            this.userManager = userManager;
+        }
 
         public RegistrationRequestsViewModel RegistrationRequests(int pageIndex)
         {
@@ -93,14 +105,30 @@
 
             shelter.RegistrationStatus = RequestStatus.Аccepted;
 
+            string message = $"Your request for registrating as {shelter.Name} shelter has been approved.";
+            var notification = notificationService.Create(message);
+            notificationService.AddNotificationToUser(notification.Id, shelter.UserId);
+
             this.data.SaveChanges();
         }
 
         public void DeclineRequest(int id)
         {
             var shelter = this.GetShelterById(id);
+            this.data.Shelters.Remove(shelter);
 
-            shelter.RegistrationStatus = RequestStatus.Declined;
+            Task
+                .Run(async () =>
+                {
+                    var user = this.userManager.FindByIdAsync(shelter.UserId).Result;
+                    await userManager.RemoveFromRoleAsync(user, ShelterRoleName);
+                })
+                .GetAwaiter()
+                .GetResult();
+
+            string message = $"Your request for registrating as {shelter.Name} shelter has been declined. You can send new request.";
+            var notification = notificationService.Create(message);
+            notificationService.AddNotificationToUser(notification.Id, shelter.UserId);
 
             this.data.SaveChanges();
         }

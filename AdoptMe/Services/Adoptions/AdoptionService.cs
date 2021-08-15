@@ -2,7 +2,9 @@
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Collections.Generic;
+    using Microsoft.AspNetCore.Identity;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Adoptions;
@@ -11,18 +13,24 @@
 
     using static Data.Models.Enums.RequestStatus;
     using static Common.GlobalConstants.PageSizes;
+    using static Common.GlobalConstants.Roles;
 
     public class AdoptionService : IAdoptionService
     {
         private readonly IUserService userService;
         private readonly INotificationService notificationService;
+        private readonly UserManager<User> userManager;
         private readonly AdoptMeDbContext data;
 
-        public AdoptionService(IUserService userService, AdoptMeDbContext data, INotificationService notificationService)
+        public AdoptionService(IUserService userService,
+            INotificationService notificationService,
+            AdoptMeDbContext data,
+            UserManager<User> userManager)
         {
             this.userService = userService;
             this.data = data;
             this.notificationService = notificationService;
+            this.userManager = userManager;
         }
 
         public int CreateAdoption(string firstName, string lastName, int аge, string firstQuestion,
@@ -48,6 +56,15 @@
                 this.data.Adopters.Add(adopter);
                 this.data.SaveChanges();
             }
+
+            Task
+                .Run(async () =>
+                {
+                    var user = this.userManager.FindByIdAsync(adopter.UserId).Result;
+                    await userManager.AddToRoleAsync(user, AdopterRoleName);
+                })
+                .GetAwaiter()
+                .GetResult();
 
             var pet = this.data
                     .Pets

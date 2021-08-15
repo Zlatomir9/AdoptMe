@@ -14,8 +14,8 @@
         }
 
         else if (!this.User.IsInRole(AdminRoleName) 
-            && !sheltersService.RegistrationIsSubmitted(userId) 
-            && !sheltersService.RegistrationIsDeclined(userId))
+            && (!sheltersService.RegistrationIsSubmitted(userId))
+            && (!this.User.IsInRole(AdopterRoleName)))
         {
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="" asp-controller="Shelters" asp-action="Create">Register as shelter</a>

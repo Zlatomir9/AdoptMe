@@ -57,16 +57,19 @@
                 .Run(async () =>
                 {
                     if ((await roleManager.RoleExistsAsync(AdminRoleName))
-                        && (await roleManager.RoleExistsAsync(ShelterRoleName)))
+                        && (await roleManager.RoleExistsAsync(ShelterRoleName))
+                        && (await roleManager.RoleExistsAsync(AdopterRoleName)))
                     {
                         return;
                     }
 
                     var adminRole = new IdentityRole { Name = AdminRoleName };
                     var shelterRole = new IdentityRole { Name = ShelterRoleName };
+                    var adopetrRole = new IdentityRole { Name = AdopterRoleName };
 
                     await roleManager.CreateAsync(adminRole);
                     await roleManager.CreateAsync(shelterRole);
+                    await roleManager.CreateAsync(adopetrRole);
                 })
                 .GetAwaiter()
                 .GetResult();
@@ -76,6 +79,10 @@
         {
             var userManager = services.GetRequiredService<UserManager<User>>();
 
+            if (userManager.Users.Any(x => x.UserName == AdminUsername))
+            {
+                return;
+            }
 
             Task
                 .Run(async () =>

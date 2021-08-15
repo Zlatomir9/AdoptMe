@@ -6,6 +6,7 @@
         {
             public const string AdminRoleName = "Administrator";
             public const string ShelterRoleName = "Shelter";
+            public const string AdopterRoleName = "Adopter";
         }
 
         public class Administrator

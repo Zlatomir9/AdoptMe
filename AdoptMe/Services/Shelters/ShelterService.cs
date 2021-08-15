@@ -100,10 +100,5 @@
             => this.data
                    .Shelters
                    .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Submitted);
-
-        public bool RegistrationIsDeclined(string userId)
-            => this.data
-                   .Shelters
-                   .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Declined);
     }
 }

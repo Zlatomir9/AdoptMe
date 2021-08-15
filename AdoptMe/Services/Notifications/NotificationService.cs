@@ -45,7 +45,7 @@
             }
 
             this.data.UserNotifications.Add(userNotification);
-            this.data.SaveChangesAsync();
+            this.data.SaveChanges();
 
             return true;
         }

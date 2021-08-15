@@ -62,9 +62,9 @@
 
             modelBuilder
                 .Entity<Shelter>()
-                .HasOne<Address>()
-                .WithOne()
-                .HasForeignKey<Shelter>(a => a.AddressId)
+                .HasOne(s => s.Address)
+                .WithMany(s => s.Shelters)
+                .HasForeignKey(a => a.AddressId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder

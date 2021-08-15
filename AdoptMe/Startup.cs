@@ -30,8 +30,7 @@ namespace AdoptMe
         {
             services
                 .AddDbContext<AdoptMeDbContext>(options => 
-                    options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")),
-                    ServiceLifetime.Transient);
+                    options.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection")));
 
             services
                 .AddDefaultIdentity<User>(options =>
@@ -66,7 +65,8 @@ namespace AdoptMe
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage(); 
+                app.UseMigrationsEndPoint();
             }
             else
             {

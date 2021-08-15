@@ -1,30 +1,33 @@
 ﻿namespace AdoptMe.Services.Shelters
 {
     using System.Linq;
-    using System.Threading.Tasks;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
-    using Microsoft.AspNetCore.Identity;
+    using AdoptMe.Services.Users;
 
     using static Common.GlobalConstants.Roles;
 
     public class ShelterService : IShelterService
     {
         private readonly AdoptMeDbContext data;
-        private readonly UserManager<User> userManager;
+        private readonly IUserService userService;
 
-        public ShelterService(AdoptMeDbContext data, UserManager<User> userManager)
+        public ShelterService(AdoptMeDbContext data, IUserService userService)
         {
             this.data = data;
-            this.userManager = userManager;
+            this.userService = userService;
         }
 
-        public int Create(string userId, string name, string phoneNumber, 
-            string email, string cityName, string streetName, string streetNumber)
+        public int Create(string name, string phoneNumber, 
+            string cityName, string streetName, string streetNumber)
         {
-            var cityData = this.data.Cities.FirstOrDefault(c => c.Name == cityName);
-            var addressData = this.data.Addresses.FirstOrDefault(a => a.StreetName == streetName && a.StreetNumber == streetNumber);
+            var cityData = this.data.Cities
+                .FirstOrDefault(c => c.Name == cityName);
+
+            var addressData = this.data.Addresses
+                .FirstOrDefault(a => a.StreetName == streetName && 
+                                     a.StreetNumber == streetNumber);
 
             if (cityData == null)
             {
@@ -54,22 +57,15 @@
 
             var shelterData = new Shelter
             {
-                UserId = userId,
+                UserId = this.userService.GetUserId(),
                 Name = name,
+                Email = this.userService.GetUserEmail(),
                 PhoneNumber = phoneNumber,
-                Email = email,
                 AddressId = addressData.Id,
                 RegistrationStatus = RequestStatus.Submitted
             };
 
-            Task
-                .Run(async () =>
-                {
-                    var user = this.userManager.FindByIdAsync(shelterData.UserId).Result;
-                    await userManager.AddToRoleAsync(user, ShelterRoleName);
-                })
-                .GetAwaiter()
-                .GetResult();
+            this.userService.AddUserToRole(shelterData.UserId, ShelterRoleName);
 
             this.data.Shelters.Add(shelterData);
             this.data.SaveChanges();
@@ -82,13 +78,6 @@
                    .Shelters
                    .Where(s => s.UserId == userId)
                    .Select(s => s.Id)
-                   .FirstOrDefault();
-
-        public string EmailByUser(string userId)
-            => this.data
-                   .Shelters
-                   .Where(s => s.UserId == userId)
-                   .Select(s => s.Email)
                    .FirstOrDefault();
 
         public bool IsShelter(string userId)

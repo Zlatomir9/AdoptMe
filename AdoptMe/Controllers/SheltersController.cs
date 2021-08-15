@@ -7,11 +7,12 @@
     using AdoptMe.Infrastructure;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Services.Shelters;
-    
+
     public class SheltersController : Controller
     {
         private readonly AdoptMeDbContext data;
         private readonly IShelterService shelter;
+        
 
         public SheltersController(AdoptMeDbContext data, IShelterService shelter)
         {
@@ -26,10 +27,7 @@
         [Authorize]
         public IActionResult Create(CreateShelterFormModel shelter)
         {
-            var userId = this.User.GetId();
-            var shelterEmail = this.User.GetEmail();
-
-            if (this.data.Shelters.Any(s => s.UserId == userId))
+            if (this.data.Shelters.Any(s => s.UserId == this.User.GetId()))
             {
                 return BadRequest();
             }
@@ -40,15 +38,13 @@
             }
 
             this.shelter.Create(
-                userId,
                 shelter.Name,
                 shelter.PhoneNumber,
-                shelterEmail,
                 shelter.CityName,
                 shelter.StreetName,
                 shelter.StreetNumber);
 
-            return RedirectToAction("All", "Pets");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

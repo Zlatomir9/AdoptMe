@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31410.357
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdoptMe", "AdoptMe\AdoptMe.csproj", "{229BDD9B-92C9-4B26-A49C-CF5A9702EEE6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdoptMe", "AdoptMe\AdoptMe.csproj", "{229BDD9B-92C9-4B26-A49C-CF5A9702EEE6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdoptMe.Tests", "AdoptMe.Tests\AdoptMe.Tests.csproj", "{B1FEA7E8-1313-45A5-992D-389FD108B538}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{229BDD9B-92C9-4B26-A49C-CF5A9702EEE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{229BDD9B-92C9-4B26-A49C-CF5A9702EEE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{229BDD9B-92C9-4B26-A49C-CF5A9702EEE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1FEA7E8-1313-45A5-992D-389FD108B538}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1FEA7E8-1313-45A5-992D-389FD108B538}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1FEA7E8-1313-45A5-992D-389FD108B538}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1FEA7E8-1313-45A5-992D-389FD108B538}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

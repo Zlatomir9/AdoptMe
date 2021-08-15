@@ -1,8 +1,6 @@
 ﻿namespace AdoptMe.Services.Administration
 {
     using System.Linq;
-    using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity;
     using AdoptMe.Data;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Data.Models.Enums;
@@ -12,20 +10,21 @@
 
     using static Common.GlobalConstants.PageSizes;
     using static Common.GlobalConstants.Roles;
+    using AdoptMe.Services.Users;
 
     public class AdministrationService : IAdministrationService
     {
         private readonly AdoptMeDbContext data;
-        private readonly UserManager<User> userManager;
         private readonly INotificationService notificationService;
+        private readonly IUserService userService;
 
         public AdministrationService(AdoptMeDbContext data, 
-            INotificationService notificationService, 
-            UserManager<User> userManager)
+            INotificationService notificationService,
+            IUserService userService)
         {
             this.data = data;
             this.notificationService = notificationService;
-            this.userManager = userManager;
+            this.userService = userService;
         }
 
         public RegistrationRequestsViewModel RegistrationRequests(int pageIndex)
@@ -40,7 +39,6 @@
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    Email = x.Email,
                     PhoneNumber = x.PhoneNumber,
                     Address = this.data.Addresses
                                 .Where(a => a.Id == x.AddressId)
@@ -102,7 +100,6 @@
         public void AcceptRequest(int id)
         {
             var shelter = this.GetShelterById(id);
-
             shelter.RegistrationStatus = RequestStatus.Аccepted;
 
             string message = $"Your request for registrating as {shelter.Name} shelter has been approved.";
@@ -115,21 +112,13 @@
         public void DeclineRequest(int id)
         {
             var shelter = this.GetShelterById(id);
-            this.data.Shelters.Remove(shelter);
-
-            Task
-                .Run(async () =>
-                {
-                    var user = this.userManager.FindByIdAsync(shelter.UserId).Result;
-                    await userManager.RemoveFromRoleAsync(user, ShelterRoleName);
-                })
-                .GetAwaiter()
-                .GetResult();
+            this.userService.RemoveUserFromRole(shelter.UserId, ShelterRoleName);
 
             string message = $"Your request for registrating as {shelter.Name} shelter has been declined. You can send new request.";
             var notification = notificationService.Create(message);
             notificationService.AddNotificationToUser(notification.Id, shelter.UserId);
 
+            this.data.Shelters.Remove(shelter);
             this.data.SaveChanges();
         }
 

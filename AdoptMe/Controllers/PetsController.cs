@@ -206,7 +206,7 @@
             return RedirectToAction(nameof(All));
         }
 
-        [Authorize]
+        [Authorize(Roles = ShelterRoleName)]
         public IActionResult MyPets(AllPetsViewModel query, string sortOrder)
         {
             ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "Date" : "";

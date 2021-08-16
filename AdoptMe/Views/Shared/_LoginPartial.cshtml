@@ -9,7 +9,7 @@
                 <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="MyPets">My pets</a>
             </li>
              <li class="nav-item">
-                <a class="nav-link text-dark" asp-controller="Adoptions" asp-action="AdoptionRequests">Adoption requests</a>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Adoptions" asp-action="AdoptionRequests">Adoption requests</a>
             </li>
         }
 
@@ -34,7 +34,8 @@
         </li>
 
         <li>
-            <a class="notifications-count" 
+            <a class="notifications-count"
+               asp-area=""
                asp-controller="Notifications"
                asp-action="AllNotifications"
                id="notificationsCount"

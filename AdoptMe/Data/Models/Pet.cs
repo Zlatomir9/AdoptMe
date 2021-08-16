@@ -42,7 +42,7 @@
 
         public Species Species { get; init; }
 
-        public int ShelterId { get; init; }
+        public int ShelterId { get; set; }
 
         public Shelter Shelter { get; init; }
 

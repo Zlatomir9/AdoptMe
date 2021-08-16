@@ -65,8 +65,6 @@
                 RegistrationStatus = RequestStatus.Submitted
             };
 
-            this.userService.AddUserToRole(shelterData.UserId, ShelterRoleName);
-
             this.data.Shelters.Add(shelterData);
             this.data.SaveChanges();
 
@@ -89,5 +87,13 @@
             => this.data
                    .Shelters
                    .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Submitted);
+
+        public string GetShelterUserIdByPet(int id)
+            => this.data
+                   .Pets
+                   .Where(x => x.Id == id)
+                   .Select(x => x.Shelter.UserId)
+                   .FirstOrDefault();
+                   
     }
 }

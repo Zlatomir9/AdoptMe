@@ -13,5 +13,15 @@
         void ReadNotification(int notificationId, string userId);
 
         bool AddNotificationToUser(int notificationId, string userId);
+
+        public void PetEditByAdminNotification(string petName, string userId);
+
+        public void PetDeletedByAdminNotification(string petName, string userId);
+
+        public void ApprovedAdoptionNotification(string petName, string userId);
+
+        public void DeclinedAdoptionNotification(string petName, string userId);
+
+        public void SentAdoptionNotification(string petName, string userId);
     }
 }

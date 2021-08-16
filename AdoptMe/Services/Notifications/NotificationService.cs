@@ -78,5 +78,49 @@
             notification.IsRead = true;
             this.data.SaveChanges();
         }
+
+        public void PetEditByAdminNotification(string petName, string userId)
+        {
+            var message = $"Your advertisment about {petName} has been edited by administrator.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, userId);
+
+            this.data.SaveChanges();
+        }
+
+        public void PetDeletedByAdminNotification(string petName, string userId)
+        {
+            var message = $"Your advertisment about {petName} has been deleted by administrator.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, userId);
+
+            this.data.SaveChanges();
+        }
+
+        public void ApprovedAdoptionNotification(string petName, string userId)
+        {
+            var message = $"Congratulations, your application for adopting {petName} has been approved.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, userId);
+        }
+
+        public void DeclinedAdoptionNotification(string petName, string userId)
+        {
+            var message = $"Your application for adopting {petName} has been declined.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, userId);
+        }
+
+        public void SentAdoptionNotification(string petName, string userId)
+        {
+            var message = $"You received new adoption application for {petName}.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, userId);
+        }
     }
 }

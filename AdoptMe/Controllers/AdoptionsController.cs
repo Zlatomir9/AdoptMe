@@ -79,12 +79,9 @@
         [Authorize]
         public IActionResult AdoptionApplicationDetails(AdoptionDetailsViewModel model)
         {
-            var userId = this.users.GetUserId();
-            var shelterId = this.shelters.IdByUser(userId);
-
             var modelResult = this.adoptions.Details(model.Id);
 
-            if (!this.pets.IsByShelter(modelResult.PetId, shelterId))
+            if (!this.pets.AddedByShelter(modelResult.PetId, User.GetId()))
             {
                 return BadRequest();
             }

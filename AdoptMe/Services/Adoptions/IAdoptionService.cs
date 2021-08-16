@@ -23,11 +23,7 @@
 
         public IEnumerable<AdoptionApplication> SubmittedPetAdoptionApplications(int id);
 
-        public void ApprovedAdoptionNotification(string petName, string userId);
-
-        public void DeclinedAdoptionNotification(string petName, string userId);
-
-        public void SentAdoptionNotification(string petName, string userId);
+        public void DeclineAdoptionWhenPetIsDeleted(int petId);
 
         public Adopter GetAdopter(int id);
     }

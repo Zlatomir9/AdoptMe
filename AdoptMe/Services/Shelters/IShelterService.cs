@@ -9,5 +9,7 @@
         public bool RegistrationIsSubmitted(string userId);
 
         public int IdByUser(string userId);
+
+        public string GetShelterUserIdByPet(int id);
     }
 }

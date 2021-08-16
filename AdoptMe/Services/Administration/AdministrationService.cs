@@ -101,6 +101,7 @@
         {
             var shelter = this.GetShelterById(id);
             shelter.RegistrationStatus = RequestStatus.Аccepted;
+            this.userService.AddUserToRole(shelter.UserId, ShelterRoleName);
 
             string message = $"Your request for registrating as {shelter.Name} shelter has been approved.";
             var notification = notificationService.Create(message);
@@ -112,7 +113,6 @@
         public void DeclineRequest(int id)
         {
             var shelter = this.GetShelterById(id);
-            this.userService.RemoveUserFromRole(shelter.UserId, ShelterRoleName);
 
             string message = $"Your request for registrating as {shelter.Name} shelter has been declined. You can send new request.";
             var notification = notificationService.Create(message);

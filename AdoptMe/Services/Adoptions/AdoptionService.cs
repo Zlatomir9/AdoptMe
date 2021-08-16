@@ -88,7 +88,7 @@
                 SubmittedOn = DateTime.UtcNow
             };
 
-            SentAdoptionNotification(pet.Name, shelter.UserId);
+            this.notificationService.SentAdoptionNotification(pet.Name, shelter.UserId);
 
             this.data.AdoptionApplications.Add(adoptionData);
             this.data.SaveChanges();
@@ -162,7 +162,7 @@
 
             var adopterData = GetAdopter(adoptionApplication.AdopterId);
 
-            ApprovedAdoptionNotification(petData.Name, adopterData.UserId);
+            this.notificationService.ApprovedAdoptionNotification(petData.Name, adopterData.UserId);
 
             var submittedApplications = SubmittedPetAdoptionApplications(petData.Id);
 
@@ -172,7 +172,7 @@
                 {
                     application.RequestStatus = Declined;
                     var adopter = GetAdopter(application.AdopterId);
-                    DeclinedAdoptionNotification(petData.Name, adopter.UserId);
+                    this.notificationService.DeclinedAdoptionNotification(petData.Name, adopter.UserId);
 
                     this.data.SaveChanges();
                 }
@@ -191,39 +191,28 @@
 
             var adopterData = GetAdopter(adoptionApplication.AdopterId);
 
-            DeclinedAdoptionNotification(petData.Name, adopterData.UserId);
+            this.notificationService.DeclinedAdoptionNotification(petData.Name, adopterData.UserId);
 
             this.data.SaveChanges();
         }
 
-        public void ApprovedAdoptionNotification(string petName, string userId)
+        public void DeclineAdoptionWhenPetIsDeleted(int petId)
         {
-            var message = $"Congratulations, your application for adopting {petName} has been approved.";
+            var petAdoptionApplications = this.data
+                    .AdoptionApplications
+                    .Where(x => x.PetId == petId && x.RequestStatus == Submitted);
 
-            var notification = this.notificationService.Create(message);
+            if (petAdoptionApplications.Any())
+            {
+                foreach (var application in petAdoptionApplications)
+                {
+                    application.RequestStatus = Declined;
+                    notificationService.DeclinedAdoptionNotification(
+                        application.Pet.Name, application.Adopter.UserId);
 
-            this.notificationService
-                .AddNotificationToUser(notification.Id, userId);
-        }
-
-        public void DeclinedAdoptionNotification(string petName, string userId)
-        {
-            var message = $"Your application for adopting {petName} has been declined.";
-
-            var notification = this.notificationService.Create(message);
-
-            this.notificationService
-                .AddNotificationToUser(notification.Id, userId);
-        }
-
-        public void SentAdoptionNotification(string petName, string userId)
-        {
-            var message = $"You received new adoption application for {petName}.";
-
-            var notification = this.notificationService.Create(message);
-
-            this.notificationService
-                .AddNotificationToUser(notification.Id, userId);
+                    this.data.SaveChanges();
+                }
+            }
         }
 
         public bool SentApplication(int id)

@@ -1,6 +1,7 @@
 ﻿namespace AdoptMe.Services.Pets
 {
     using System.Collections.Generic;
+    using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
 
@@ -22,12 +23,10 @@
 
         IEnumerable<PetSpeciesModel> AllSpecies();
 
-        bool IsByShelter(int petId, int shelterId);
+        bool AddedByShelter(int petId, string userId);
 
         public bool SpeciesExists(int speciesId);
 
-        public void PetEditByAdminNotification(string petName, string userId);
-
-        public void PetDeletedByAdminNotification(string petName, string userId);
+        public Pet GetPetById(int id);
     }
 }

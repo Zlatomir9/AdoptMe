@@ -42,7 +42,7 @@
             <img src="@Model.ImageUrl" alt="image" style="width: 646px; height: 517px;" class="rounded mb-4">
             <div class="text-center">
 
-                @if (!petsService.IsByShelter(Model.Id, shelterId) &&
+                @if (!petsService.AddedByShelter(Model.Id, Model.UserId) &&
                    !this.User.IsInRole(AdminRoleName) &&
                    Model.IsAdopted == false &&
                    Model.IsDeleted == false)

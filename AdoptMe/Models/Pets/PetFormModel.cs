@@ -12,7 +12,6 @@
         [StringLength(NameMaxLength, MinimumLength = NameMinLength)]
         public string Name { get; init; }
 
-        [Range(AgeMinValue, AgeMaxValue)]
         public Age Age { get; init; }
 
         public Gender Gender { get; init; }

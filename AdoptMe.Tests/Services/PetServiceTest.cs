@@ -45,7 +45,7 @@
         }
 
         [Theory]
-        [InlineData(10, "Name2", Age.Adult, "Pit bull", "Yellow", Gender.Female,
+        [InlineData(2, "Name2", Age.Adult, "Pit bull", "Yellow", Gender.Female,
             "Behold 12-year-old SIR NEKO! Like any true gentleman, he knows his manners, Sit, Stay, Come. His beard may be frosted, but he still enjoys a good game of fetch or a nicely paced stroll on the trail", 
             "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/YellowLabradorLooking_new.jpg/250px-YellowLabradorLooking_new.jpg", 
             1)]
@@ -83,24 +83,24 @@
 
             var petService = new PetService(db, null, null, null, null, null);
 
-            petService.Edit(id, name, age, breed, color, gender, myStory, imageUrl, 3);
+            petService.Edit(id, name, Age.Young, breed, color, gender, myStory, imageUrl, speciesId);
 
-            var actual = db.Pets.FirstOrDefault();
+            var result = db.Pets.FirstOrDefault(x => x.Id == pet.Id);
 
             var expected = new Pet
             {
-                Id = 10,
+                Id = id,
                 Name = name,
-                Age = age,
+                Age = Age.Young,
                 Breed = breed,
                 Color = color,
                 Gender = gender,
                 MyStory = myStory,
                 ImageUrl = imageUrl,
-                SpeciesId = 3
+                SpeciesId = speciesId
             };
 
-            actual.Should().BeEquivalentTo(expected);
+            result.Should().BeEquivalentTo(expected);
         }
 
         [Theory]
@@ -117,7 +117,7 @@
             {
                 Id = id,
                 Name = "Name",
-                Age = Age.Senior,
+                Age = Age.Adult,
                 Breed = "Breed",
                 Color = "Color",
                 Gender = Gender.Female,
@@ -131,9 +131,9 @@
 
             var petService = new PetService(db, null, null, null, null, null);
 
-            petService.Delete(1);
+            petService.Delete(3);
 
-            var result = db.Pets.FirstOrDefault();
+            var result = db.Pets.FirstOrDefault(x => x.Id == id);
 
             result.IsDeleted.Should().BeTrue();
         }

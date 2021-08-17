@@ -4,18 +4,13 @@
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
-    using AdoptMe.Services.Users;
 
     public class ShelterService : IShelterService
     {
         private readonly AdoptMeDbContext data;
-        private readonly IUserService userService;
 
-        public ShelterService(AdoptMeDbContext data, IUserService userService)
-        {
-            this.data = data;
-            this.userService = userService;
-        }
+        public ShelterService(AdoptMeDbContext data)
+            => this.data = data;
 
         public int Create(string name, string phoneNumber, string cityName, string streetName, string streetNumber, string userId)
         {
@@ -73,11 +68,6 @@
                    .Where(s => s.UserId == userId)
                    .Select(s => s.Id)
                    .FirstOrDefault();
-
-        public bool IsShelter(string userId)
-            => this.data
-                   .Shelters
-                   .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Аccepted);
 
         public bool RegistrationIsSubmitted(string userId)
             => this.data

@@ -5,6 +5,7 @@
     using Microsoft.AspNetCore.Authorization;
     using AdoptMe.Services.Notifications;
     using AdoptMe.Services.Users;
+    using AdoptMe.Infrastructure;
 
     [Authorize]
     public class NotificationsController : Controller
@@ -20,7 +21,7 @@
 
         public IActionResult GetNotifications()
         {
-            var userId = userService.GetUserId();
+            var userId = this.User.GetId();
             var notifications = this.notificationService.GetUserNotifications(userId);
 
             return Json( new { Count = notifications.Count() });
@@ -29,7 +30,7 @@
         [HttpPost]
         public IActionResult ReadNotification(int notificationId)
         {
-            var userId = userService.GetUserId();
+            var userId = this.User.GetId();
             this.notificationService.ReadNotification(notificationId, userId);
 
             return RedirectToAction(nameof(AllNotifications));
@@ -37,7 +38,7 @@
 
         public IActionResult AllNotifications()
         {
-            var userId = userService.GetUserId();
+            var userId = this.User.GetId();
             var notificationsQuery = this.notificationService.GetUserNotifications(userId);
 
             return View(notificationsQuery);

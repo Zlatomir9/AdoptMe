@@ -5,8 +5,6 @@
     using Microsoft.AspNetCore.Identity;
     using AdoptMe.Data.Models;
 
-    using static Common.GlobalConstants.Roles;
-
     public class UserService : IUserService
     {
         private readonly IHttpContextAccessor httpContextAccessor; 

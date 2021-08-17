@@ -18,21 +18,18 @@
     {
         private readonly IPetService petService;
         private readonly IShelterService shelterService;
-        private readonly IUserService userService;
         private readonly INotificationService notificationService;
         private readonly IAdoptionService adoptionService;
         private readonly IMapper mapper;
 
         public PetsController(IPetService petService,
             IShelterService shelterService,
-            IUserService userService,
             INotificationService notificationService,
             IMapper mapper, 
             IAdoptionService adoptionService)
         {
             this.petService = petService;
             this.shelterService = shelterService;
-            this.userService = userService;
             this.mapper = mapper;
             this.notificationService = notificationService;
             this.adoptionService = adoptionService;
@@ -56,8 +53,8 @@
 
         public IActionResult Details(PetDetailsViewModel model)
         {
-           var modelResult = this.petService.
-                Details(model.Id);
+           var modelResult = this.petService
+                .Details(model.Id);
 
            return View(modelResult);
         }

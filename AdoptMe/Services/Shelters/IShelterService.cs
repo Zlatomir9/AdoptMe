@@ -4,8 +4,6 @@
     {
         int Create(string name, string phoneNumber, string cityName, string streetName, string streetNumber, string userId);
 
-        public bool IsShelter(string userId);
-
         public bool RegistrationIsSubmitted(string userId);
 
         public int IdByUser(string userId);

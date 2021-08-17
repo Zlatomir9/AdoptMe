@@ -18,9 +18,9 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (SignInManager.IsSignedIn(this.User)
-                           && sheltersService.IsShelter(UserManager.GetUserId(this.User))
-                           && !this.User.IsInRole(AdminRoleName))
+                        @if ((SignInManager.IsSignedIn(this.User))
+                           && (this.User.IsInRole(ShelterRoleName))
+                           && (!this.User.IsInRole(AdminRoleName)))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" 

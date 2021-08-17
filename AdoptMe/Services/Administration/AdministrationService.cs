@@ -7,10 +7,10 @@
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Notifications;
+    using AdoptMe.Services.Users;
 
     using static Common.GlobalConstants.PageSizes;
     using static Common.GlobalConstants.Roles;
-    using AdoptMe.Services.Users;
 
     public class AdministrationService : IAdministrationService
     {

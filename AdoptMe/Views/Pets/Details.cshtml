@@ -41,10 +41,10 @@
             <img src="@Model.ImageUrl" alt="image" style="width: 646px; height: 517px;" class="rounded mb-4">
             <div class="text-center">
 
-                @if (!petsService.AddedByShelter(Model.Id, userId) &&
-                   !this.User.IsInRole(AdminRoleName) &&
-                   Model.IsAdopted == false &&
-                   Model.IsDeleted == false)
+                @if (!petsService.AddedByShelter(Model.Id, userId) 
+                    && !this.User.IsInRole(AdminRoleName) 
+                    && Model.IsAdopted == false 
+                    && Model.IsDeleted == false)
                 {
                     <a asp-area="" 
                        asp-controller="Adoptions" 

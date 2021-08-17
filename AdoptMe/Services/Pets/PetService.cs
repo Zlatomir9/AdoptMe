@@ -192,6 +192,17 @@
             this.data.SaveChanges();            
         }
 
+        public void IsAdopted(int id)
+        {
+            var petData = this.data
+                    .Pets
+                    .FirstOrDefault(x => x.Id == id);
+
+            petData.IsAdopted = true;
+
+            this.data.SaveChanges();
+        }
+
         public IEnumerable<PetSpeciesModel> AllSpecies()
            => this.data
                .Species

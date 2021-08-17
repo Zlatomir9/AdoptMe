@@ -192,7 +192,7 @@
 
             this.petService.Delete(id);
 
-            this.adoptionService.DeclineAdoptionWhenPetIsDeleted(id);
+            this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(id);
 
             if (User.IsInRole(AdminRoleName))
             {

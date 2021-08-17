@@ -2,9 +2,7 @@
 {
     using System;
     using System.Linq;
-    using System.Threading.Tasks;
     using System.Collections.Generic;
-    using Microsoft.AspNetCore.Identity;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Adoptions;
@@ -13,93 +11,46 @@
 
     using static Data.Models.Enums.RequestStatus;
     using static Common.GlobalConstants.PageSizes;
-    using static Common.GlobalConstants.Roles;
 
     public class AdoptionService : IAdoptionService
     {
-        private readonly IUserService userService;
         private readonly INotificationService notificationService;
-        private readonly UserManager<User> userManager;
         private readonly AdoptMeDbContext data;
 
-        public AdoptionService(IUserService userService,
-            INotificationService notificationService,
-            AdoptMeDbContext data,
-            UserManager<User> userManager)
+        public AdoptionService(INotificationService notificationService, AdoptMeDbContext data)
         {
-            this.userService = userService;
             this.data = data;
             this.notificationService = notificationService;
-            this.userManager = userManager;
         }
 
-        public int CreateAdoption(string firstName, string lastName, int аge, string firstQuestion,
-            string secondQuestion, string thirdQuestion, string fourthQuestion, int petId)
+        public int CreateAdoption(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int petId, string userId)
         {
-            var userId = this.userService.GetUserId();
-
             var adopter = this.data
                     .Adopters
                     .Where(x => x.UserId == userId)
                     .FirstOrDefault();
 
-            if (adopter == null)
-            {
-                adopter = new Adopter
-                {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Age = аge,
-                    UserId = userId
-                };
-
-                this.data.Adopters.Add(adopter);
-                this.data.SaveChanges();
-            }
-
-            Task
-                .Run(async () =>
-                {
-                    var user = this.userManager.FindByIdAsync(adopter.UserId).Result;
-                    await userManager.AddToRoleAsync(user, AdopterRoleName);
-                })
-                .GetAwaiter()
-                .GetResult();
-
-            var pet = this.data
-                    .Pets
-                    .Where(x => x.Id == petId &&
-                           x.IsAdopted == false)
-                    .FirstOrDefault();
-
-            var shelter = this.data
-                    .Shelters
-                    .FirstOrDefault(x => x.Id == pet.ShelterId);
-
             var adoptionData = new AdoptionApplication
             {
                 AdopterId = adopter.Id,
-                PetId = pet.Id,
+                Adopter = adopter,
+                PetId = petId,
                 RequestStatus = Submitted,
                 FirstAnswer = firstQuestion,
                 SecondAnswer = secondQuestion,
                 ThirdAnswer = thirdQuestion,
-                FourthAnswer = firstQuestion,
+                FourthAnswer = fourthQuestion,
                 SubmittedOn = DateTime.UtcNow
             };
-
-            this.notificationService.SentAdoptionNotification(pet.Name, shelter.UserId);
 
             this.data.AdoptionApplications.Add(adoptionData);
             this.data.SaveChanges();
 
-            return adoptionData.PetId;
+            return adoptionData.Id;
         }
 
-        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex)
+        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex, string userId)
         {
-            var userId = this.userService.GetUserId();
-
             var adoptionsQuery = this.data
                 .AdoptionApplications
                 .Where(s => s.RequestStatus == Submitted && s.Pet.Shelter.UserId == userId)
@@ -148,80 +99,49 @@
 
         public void ApproveAdoption(int id)
         {
-            var adoptionApplication = GetApplication(id);
+            var adoptionApplication = GetAdoption(id);
 
             adoptionApplication.RequestStatus = Аccepted;
 
-            var petData = this.data
-                    .Pets
-                    .FirstOrDefault(x => x.Id == adoptionApplication.PetId);
-            
-            petData.IsAdopted = true;
-
             this.data.SaveChanges();
-
-            var adopterData = GetAdopter(adoptionApplication.AdopterId);
-
-            this.notificationService.ApprovedAdoptionNotification(petData.Name, adopterData.UserId);
-
-            var submittedApplications = SubmittedPetAdoptionApplications(petData.Id);
-
-            if (submittedApplications.Any())
-            {
-                foreach (var application in submittedApplications)
-                {
-                    application.RequestStatus = Declined;
-                    var adopter = GetAdopter(application.AdopterId);
-                    this.notificationService.DeclinedAdoptionNotification(petData.Name, adopter.UserId);
-
-                    this.data.SaveChanges();
-                }
-            }
         }
 
         public void DeclineAdoption(int id)
         {
-            var adoptionApplication = GetApplication(id);
-
-            var petData = this.data
-                    .Pets
-                    .FirstOrDefault(x => x.Id == adoptionApplication.PetId);
+            var adoptionApplication = GetAdoption(id);
 
             adoptionApplication.RequestStatus = Declined;
-
-            var adopterData = GetAdopter(adoptionApplication.AdopterId);
-
-            this.notificationService.DeclinedAdoptionNotification(petData.Name, adopterData.UserId);
 
             this.data.SaveChanges();
         }
 
-        public void DeclineAdoptionWhenPetIsDeleted(int petId)
+        public void DeclineAdoptionWhenPetIsDeletedOrAdopted(int petId)
         {
-            var petAdoptionApplications = this.data
-                    .AdoptionApplications
-                    .Where(x => x.PetId == petId && x.RequestStatus == Submitted);
+            var petAdoptionApplications = this.SubmittedPetAdoptionApplications(petId);
 
             if (petAdoptionApplications.Any())
             {
                 foreach (var application in petAdoptionApplications)
                 {
+                    var adopter = this.GetAdopterByAdoptionId(application.Id);
+
                     application.RequestStatus = Declined;
-                    notificationService.DeclinedAdoptionNotification(
-                        application.Pet.Name, application.Adopter.UserId);
+                    notificationService.DeclineAdoptionNotification(application.Pet.Name,
+                                                                    adopter.UserId);
 
                     this.data.SaveChanges();
                 }
             }
         }
 
-        public bool SentApplication(int id)
+        public bool SentApplication(int id, string userId)
             => this.data
                 .AdoptionApplications
-                .Any(x => x.Adopter.UserId == userService.GetUserId() &&
-                          x.PetId == id);
+                .Any(x => x.Adopter.UserId == userId
+                          && x.PetId == id
+                          && x.RequestStatus == Submitted);
 
-        public AdoptionApplication GetApplication(int id)
+        public AdoptionApplication GetAdoption(int id)
             => this.data
                     .AdoptionApplications
                     .Where(x => x.Id == id)
@@ -233,9 +153,14 @@
                 .Where(x => x.PetId == petId && x.RequestStatus == Submitted)
                 .ToList();
 
-        public Adopter GetAdopter(int id)
+        public Adopter GetAdopterByAdoptionId(int id)
             => this.data
                    .Adopters
-                   .FirstOrDefault(x => x.Id == id);
+                   .FirstOrDefault(x => x.AdoptionApplications.Any(x => x.Id == id));
+
+        public Pet GetPetByAdoptionId(int id)
+            => this.data
+                   .Pets
+                   .FirstOrDefault(x => x.AdoptionApplications.Any(x => x.Id == id));
     }
 }

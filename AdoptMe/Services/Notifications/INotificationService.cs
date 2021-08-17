@@ -18,9 +18,9 @@
 
         public void PetDeletedByAdminNotification(string petName, string userId);
 
-        public void ApprovedAdoptionNotification(string petName, string userId);
+        public void ApproveAdoptionNotification(string petName, string userId);
 
-        public void DeclinedAdoptionNotification(string petName, string userId);
+        public void DeclineAdoptionNotification(string petName, string userId);
 
         public void SentAdoptionNotification(string petName, string userId);
     }

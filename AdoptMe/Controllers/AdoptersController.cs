@@ -1,28 +1,27 @@
 ﻿namespace AdoptMe.Controllers
 {
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
-    using AdoptMe.Models.Shelters;
-    using AdoptMe.Services.Shelters;
+    using Microsoft.AspNetCore.Mvc;
     using AdoptMe.Data.Models;
+    using AdoptMe.Models.Adopters;
+    using AdoptMe.Services.Adopters;
 
     using static Common.GlobalConstants.Roles;
 
-    public class SheltersController : Controller
+    public class AdoptersController : Controller
     {
-        private readonly IShelterService shelterService;
         private readonly UserManager<User> userManager;
+        private readonly IAdopterService adopterService;
 
-
-        public SheltersController(IShelterService shelterService, UserManager<User> userManager)
+        public AdoptersController(UserManager<User> userManager, IAdopterService adopterService)
         {
-            this.shelterService = shelterService;
             this.userManager = userManager;
+            this.adopterService = adopterService;
         }
 
         [Authorize]
-        public IActionResult Create()
+        public IActionResult Become()
         {
             if (User.IsInRole(ShelterRoleName)
                 || User.IsInRole(AdopterRoleName)
@@ -36,21 +35,19 @@
 
         [HttpPost]
         [Authorize]
-        public IActionResult Create(CreateShelterFormModel shelter)
+        public IActionResult Become(BecomeAdopterFormModel adopter)
         {
             if (!ModelState.IsValid)
             {
-                return View(shelter);
+                return View(adopter);
             }
 
             var userId = this.userManager.GetUserId(this.User);
 
-            this.shelterService.Create(
-                shelter.Name,
-                shelter.PhoneNumber,
-                shelter.CityName,
-                shelter.StreetName,
-                shelter.StreetNumber,
+            this.adopterService.Create(
+                adopter.FirstName,
+                adopter.LastName,
+                adopter.Age,
                 userId);
 
             return RedirectToAction("Index", "Home");

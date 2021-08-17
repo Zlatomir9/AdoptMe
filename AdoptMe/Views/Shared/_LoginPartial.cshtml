@@ -3,34 +3,54 @@
     {
         var userId = UserManager.GetUserId(this.User);
 
-        @if (this.User.IsInRole(ShelterRoleName) && !this.User.IsInRole(AdminRoleName))
+        @if (this.User.IsInRole(ShelterRoleName))
         {
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="MyPets">My pets</a>
+                <a class="nav-link text-dark" 
+                   asp-area="" 
+                   asp-controller="Pets" 
+                   asp-action="MyPets">My pets</a>
             </li>
              <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Adoptions" asp-action="AdoptionRequests">Adoption requests</a>
+                <a class="nav-link text-dark" 
+                   asp-area="" 
+                   asp-controller="Adoptions" 
+                   asp-action="AdoptionRequests">Adoption requests</a>
             </li>
         }
 
         else if (!this.User.IsInRole(AdminRoleName) 
             && (!sheltersService.RegistrationIsSubmitted(userId))
-            && (!this.User.IsInRole(AdopterRoleName)))
+            && (!adopterService.IsAdopter(userId)))
         {
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Shelters" asp-action="Create">Register as shelter</a>
+                <a class="nav-link text-dark" 
+                   asp-area="" 
+                   asp-controller="Shelters" 
+                   asp-action="Create">Register as shelter</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" 
+                   asp-area="" 
+                   asp-controller="Adopters" 
+                   asp-action="Become">Become adopter</a>
             </li>
         }
 
         else if (this.User.IsInRole(AdminRoleName))
         {
             <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="Administration" asp-controller="AdminPanel" asp-action="Index">Administration panel</a>
+                <a class="nav-link text-dark" 
+                   asp-area="Administration" 
+                   asp-controller="AdminPanel" 
+                   asp-action="Index">Administration panel</a>
             </li>
         }
 
         <li class="nav-item">
-            <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
+            <a  class="nav-link text-dark" 
+               asp-area="Identity" 
+               asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity.Name!</a>
         </li>
 
         <li>
@@ -44,7 +64,10 @@
         </li>
 
         <li class="nav-item">
-            <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+            <form  class="form-inline" 
+                  asp-area="Identity" 
+                  asp-page="/Account/Logout" 
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                 <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
             </form>
         </li>

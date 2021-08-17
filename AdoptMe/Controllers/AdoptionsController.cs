@@ -9,32 +9,42 @@
     using AdoptMe.Services.Users;
     using AdoptMe.Services.Shelters;
     using AdoptMe.Services.Pets;
+    using AdoptMe.Services.Notifications;
+
+    using static Common.GlobalConstants.Roles;
 
     public class AdoptionsController : Controller
     {
-        private readonly IAdoptionService adoptions;
-        private readonly IUserService users;
-        private readonly IShelterService shelters;
-        private readonly IPetService pets;
+        private readonly IAdoptionService adoptionService;
+        private readonly IUserService userService;
+        private readonly IShelterService shelterService;
+        private readonly IPetService petService;
+        private readonly INotificationService notificationService;
 
-        public AdoptionsController(IAdoptionService adoptions, IUserService users, 
-            IShelterService shelters, IPetService pets)
+        public AdoptionsController(IAdoptionService adoptionService,
+            IUserService userService,
+            IShelterService shelterService,
+            IPetService petService, 
+            INotificationService notificationService)
         {
-            this.adoptions = adoptions;
-            this.users = users;
-            this.shelters = shelters;
-            this.pets = pets;
+            this.adoptionService = adoptionService;
+            this.userService = userService;
+            this.shelterService = shelterService;
+            this.petService = petService;
+            this.notificationService = notificationService;
         }
 
-        [Authorize]
+        [Authorize(Roles = AdopterRoleName)]
         public IActionResult AdoptionApplication(int id)
         {
+            var userId = this.User.GetId();
+
             if (User.IsAdmin() || User.IsShelter())
             {
                 return BadRequest();
             }
 
-            if (adoptions.SentApplication(id))
+            if (adoptionService.SentApplication(id, userId))
             {
                 return BadRequest();
             }
@@ -43,7 +53,7 @@
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = AdopterRoleName)]
         public IActionResult AdoptionApplication(int id, AdoptionFormModel adoption)
         {
             if (!ModelState.IsValid)
@@ -51,15 +61,20 @@
                 return View(adoption);
             }
 
-            this.adoptions.CreateAdoption(
-                adoption.FirstName,
-                adoption.LastName,
-                adoption.Age,
+            var userId = this.User.GetId();
+
+            this.adoptionService.CreateAdoption(
                 adoption.FirstQuestion,
                 adoption.SecondQuestion,
                 adoption.ThirdQuestion,
                 adoption.FourthQuestion,
-                id);
+                id,
+                userId);
+
+            var pet = this.petService.GetPetById(id);
+            var shelterUserId = this.shelterService.GetShelterUserIdByPet(id);
+
+            this.notificationService.SentAdoptionNotification(pet.Name, shelterUserId);
 
             return RedirectToAction("All", "Pets");
         }
@@ -67,8 +82,10 @@
         [Authorize]
         public IActionResult AdoptionRequests(AdoptionApplicationsViewModel query)
         {
-            var queryResult = this.adoptions.AdoptionApplications(
-                query.PageIndex);
+            var userId = this.User.GetId();
+
+            var queryResult = this.adoptionService.AdoptionApplications(
+                query.PageIndex, userId);
 
             query.TotalAdoptionApplications = queryResult.TotalAdoptionApplications;
             query.Adoptions = queryResult.Adoptions;
@@ -79,9 +96,9 @@
         [Authorize]
         public IActionResult AdoptionApplicationDetails(AdoptionDetailsViewModel model)
         {
-            var modelResult = this.adoptions.Details(model.Id);
+            var modelResult = this.adoptionService.Details(model.Id);
 
-            if (!this.pets.AddedByShelter(modelResult.PetId, User.GetId()))
+            if (!this.petService.AddedByShelter(modelResult.PetId, User.GetId()))
             {
                 return BadRequest();
             }
@@ -98,7 +115,14 @@
                 return this.NotFound();
             }
 
-            this.adoptions.ApproveAdoption(id);
+            this.adoptionService.ApproveAdoption(id);
+
+            var pet = this.adoptionService.GetPetByAdoptionId(id);
+            var adopter = this.adoptionService.GetAdopterByAdoptionId(id);
+
+            this.petService.IsAdopted(pet.Id);
+            this.notificationService.ApproveAdoptionNotification(pet.Name, adopter.UserId);
+            this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(pet.Id);
 
             return this.RedirectToAction(nameof(AdoptionRequests));
         }
@@ -112,7 +136,12 @@
                 return this.NotFound();
             }
 
-            this.adoptions.DeclineAdoption(id);
+            this.adoptionService.DeclineAdoption(id);
+
+            var pet = this.adoptionService.GetPetByAdoptionId(id);
+            var adopter = this.adoptionService.GetAdopterByAdoptionId(id);
+
+            this.notificationService.DeclineAdoptionNotification(pet.Name, adopter.UserId);
 
             return this.RedirectToAction(nameof(AdoptionRequests));
         }

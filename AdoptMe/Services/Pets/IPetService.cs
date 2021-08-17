@@ -21,6 +21,8 @@
 
         public void Delete(int id);
 
+        public void IsAdopted(int id);
+
         IEnumerable<PetSpeciesModel> AllSpecies();
 
         bool AddedByShelter(int petId, string userId);

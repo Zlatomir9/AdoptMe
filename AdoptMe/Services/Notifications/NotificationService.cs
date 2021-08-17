@@ -99,7 +99,7 @@
             this.data.SaveChanges();
         }
 
-        public void ApprovedAdoptionNotification(string petName, string userId)
+        public void ApproveAdoptionNotification(string petName, string userId)
         {
             var message = $"Congratulations, your application for adopting {petName} has been approved.";
             var notification = this.Create(message);
@@ -107,7 +107,7 @@
             this.AddNotificationToUser(notification.Id, userId);
         }
 
-        public void DeclinedAdoptionNotification(string petName, string userId)
+        public void DeclineAdoptionNotification(string petName, string userId)
         {
             var message = $"Your application for adopting {petName} has been declined.";
             var notification = this.Create(message);

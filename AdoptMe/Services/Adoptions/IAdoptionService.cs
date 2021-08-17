@@ -6,10 +6,9 @@
 
     public interface IAdoptionService
     {
-        int CreateAdoption(string firstName, string lastName, int Age,
-            string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int id);
+        int CreateAdoption(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int id, string userId);
 
-        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex);
+        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex, string userId);
 
         public AdoptionDetailsViewModel Details(int id);
 
@@ -17,14 +16,16 @@
 
         public void DeclineAdoption(int id);
 
-        public bool SentApplication(int id);
+        public bool SentApplication(int id, string userId);
 
-        public AdoptionApplication GetApplication(int id);
+        public AdoptionApplication GetAdoption(int id);
 
         public IEnumerable<AdoptionApplication> SubmittedPetAdoptionApplications(int id);
 
-        public void DeclineAdoptionWhenPetIsDeleted(int petId);
+        public void DeclineAdoptionWhenPetIsDeletedOrAdopted(int petId);
 
-        public Adopter GetAdopter(int id);
+        public Adopter GetAdopterByAdoptionId(int id);
+
+        public Pet GetPetByAdoptionId(int id);
     }
 }

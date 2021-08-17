@@ -1,5 +1,6 @@
 namespace AdoptMe
 {
+    using System;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,7 @@ namespace AdoptMe
     using AdoptMe.Services.Shelters;
     using AdoptMe.Services.Users;
     using AdoptMe.Services.Statistics;
+    using AdoptMe.Services.Adopters;
 
     public class Startup
     {
@@ -56,7 +58,13 @@ namespace AdoptMe
                     .AddTransient<IUserService, UserService>()
                     .AddTransient<IAdoptionService, AdoptionService>()
                     .AddTransient<INotificationService, NotificationService>()
-                    .AddTransient<IStatisticsService, StatisticsService>();
+                    .AddTransient<IStatisticsService, StatisticsService>()
+                    .AddTransient<IAdopterService, AdopterService>();
+
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.FromMilliseconds(1);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

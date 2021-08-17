@@ -10,9 +10,9 @@
     using AdoptMe.Services.Shelters;
     using AdoptMe.Services.Users;
     using AdoptMe.Services.Notifications;
+    using AdoptMe.Services.Adoptions;
 
     using static Common.GlobalConstants.Roles;
-    using AdoptMe.Services.Adoptions;
 
     public class PetsController : Controller
     {
@@ -89,7 +89,7 @@
             }
 
             var shelterId = this.shelterService
-                .IdByUser(this.userService.GetUserId());
+                .IdByUser(this.User.GetId());
 
             this.petService.Add(
                 pet.Name,

@@ -1,9 +1,8 @@
 ﻿@model PetDetailsViewModel
 
 @{ 
-   ViewBag.Title = "Pet info";
-   var userId = UserManager.GetUserId(this.User);
-   var shelterId = sheltersService.IdByUser(userId); 
+    ViewBag.Title = "Pet info";
+    var userId = UserManager.GetUserId(this.User);
 }
 
 <div class="container-fluid">
@@ -42,12 +41,16 @@
             <img src="@Model.ImageUrl" alt="image" style="width: 646px; height: 517px;" class="rounded mb-4">
             <div class="text-center">
 
-                @if (!petsService.AddedByShelter(Model.Id, Model.UserId) &&
+                @if (!petsService.AddedByShelter(Model.Id, userId) &&
                    !this.User.IsInRole(AdminRoleName) &&
                    Model.IsAdopted == false &&
                    Model.IsDeleted == false)
                 {
-                    <a asp-controller="Adoptions" asp-action="AdoptionApplication" asp-route-id="@Model.Id" class="btn btn-success">Send request to adopt @Model.Name</a> 
+                    <a asp-area="" 
+                       asp-controller="Adoptions" 
+                       asp-action="AdoptionApplication" 
+                       asp-route-id="@Model.Id" 
+                       class="btn btn-success">Send request to adopt @Model.Name</a> 
                 }
 
                 else
@@ -63,10 +66,16 @@
                     else
                     {
                         <form method="post">
-                            <a asp-controller="Pets" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">Edit</a>
-                            <button type="submit" class="btn btn-outline-danger" asp-area="" asp-controller="Pets" asp-action="Delete" asp-route-id="@Model.Id">Delete</button>
+                            <a asp-area="" 
+                               asp-controller="Pets" 
+                               asp-action="Edit" 
+                               asp-route-id="@Model.Id" 
+                               class="btn btn-outline-warning">Edit</a>
+                            <button type="submit" class="btn btn-outline-danger" 
+                                    asp-area="" asp-controller="Pets" 
+                                    asp-action="Delete" 
+                                    asp-route-id="@Model.Id">Delete</button>
                         </form>
-                        
                     }
                 }
             </div>

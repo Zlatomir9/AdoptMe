@@ -3,40 +3,24 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
-    using AutoMapper;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Users;
-    using AdoptMe.Services.Adoptions;
 
     using static Common.GlobalConstants.PageSizes;
-    using AdoptMe.Services.Notifications;
-    using AdoptMe.Services.Shelters;
 
     public class PetService : IPetService
     {
         private readonly AdoptMeDbContext data;
         private readonly IUserService userService;
-        private readonly IAdoptionService adoptionService;
-        private readonly INotificationService notificationService;
-        private readonly IShelterService shelterService;
-        private readonly IMapper mapper;
+        
 
-        public PetService(AdoptMeDbContext data,
-            IMapper mapper,
-            IUserService userService,
-            IAdoptionService adoptionService,
-            INotificationService notificationService, 
-            IShelterService shelterService)
+        public PetService(AdoptMeDbContext data, IUserService userService)
         {
             this.data = data;
-            this.mapper = mapper;
             this.userService = userService;
-            this.adoptionService = adoptionService;
-            this.notificationService = notificationService;
-            this.shelterService = shelterService;
         }
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
@@ -139,7 +123,10 @@
                        Species = p.Species.ToString(),
                        ShelterName = p.Shelter.Name,
                        ShelterPhoneNumber = p.Shelter.PhoneNumber,
-                       ShelterEmail = p.Shelter.Email,
+                       ShelterEmail = this.data.Users
+                                          .Where(x => x.Id == p.Shelter.UserId)
+                                          .Select(x => x.Email)
+                                          .FirstOrDefault(),
                        UserId = p.Shelter.UserId,
                        SpeciesId = p.SpeciesId,
                        IsAdopted = p.IsAdopted,
@@ -161,7 +148,7 @@
                 ImageUrl = imageUrl,
                 SpeciesId = speciesId,
                 ShelterId = shelterId,
-                DateAdded = DateTime.UtcNow
+                DateAdded = DateTime.UtcNow,
             };
 
             this.data.Pets.Add(petData);

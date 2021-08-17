@@ -36,7 +36,7 @@
 
             var db = new AdoptMeDbContext(options);
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
 
             var pet = petService.Add(name, age, breed, color, gender, myStory, imageUrl, speciesId, shelterId);
 
@@ -87,7 +87,7 @@
             db.Pets.Add(pet);
             db.SaveChanges();
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
 
             petService.Edit(id, name, Age.Young, breed, color, gender, myStory, imageUrl, speciesId);
 
@@ -137,7 +137,7 @@
             db.Pets.Add(pet);
             db.SaveChanges();
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
 
             petService.Delete(3);
 
@@ -179,7 +179,7 @@
             db.Species.AddRange(species);
             db.SaveChanges();
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
             var result = petService.AllSpecies();
 
             var expected = new List<PetSpeciesModel>
@@ -235,7 +235,7 @@
 
             db.SaveChanges();
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
             var result = petService.AddedByShelter(petId, userId);
 
             result.Should().BeTrue();
@@ -263,7 +263,7 @@
             db.Species.Add(species);
             db.SaveChanges();
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
             var result = petService.SpeciesExists(speciesId);
 
             result.Should().BeTrue();
@@ -289,7 +289,7 @@
             db.Pets.Add(pet);
             db.SaveChanges();
 
-            var petService = new PetService(db, null, null, null, null, null);
+            var petService = new PetService(db, null);
             var result = petService.GetPetById(petId);
 
             var expected = db.Pets.FirstOrDefault(x => x.Id == petId);

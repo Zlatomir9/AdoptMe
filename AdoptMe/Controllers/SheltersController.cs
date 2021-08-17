@@ -1,23 +1,25 @@
 ﻿namespace AdoptMe.Controllers
 {
-    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
-    using AdoptMe.Data;
-    using AdoptMe.Infrastructure;
+    using Microsoft.AspNetCore.Identity;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Services.Shelters;
+    using AdoptMe.Services.Users;
+
+    using static Common.GlobalConstants.Roles;
+    using static AdoptMe.Data.DataConstants;
 
     public class SheltersController : Controller
     {
-        private readonly AdoptMeDbContext data;
-        private readonly IShelterService shelter;
-        
+        private readonly IShelterService shelterService;
+        private readonly UserManager<User> userManager;
 
-        public SheltersController(AdoptMeDbContext data, IShelterService shelter)
+
+        public SheltersController(IShelterService shelterService, UserManager<User> userManager)
         {
-            this.data = data;
-            this.shelter = shelter;
+            this.shelterService = shelterService;
+            this.userManager = userManager;
         }
 
         [Authorize]
@@ -27,7 +29,7 @@
         [Authorize]
         public IActionResult Create(CreateShelterFormModel shelter)
         {
-            if (this.data.Shelters.Any(s => s.UserId == this.User.GetId()))
+            if (User.IsInRole(ShelterRoleName))
             {
                 return BadRequest();
             }
@@ -37,12 +39,15 @@
                 return View(shelter);
             }
 
-            this.shelter.Create(
+            var userId = this.userManager.GetUserId(this.User);
+
+            this.shelterService.Create(
                 shelter.Name,
                 shelter.PhoneNumber,
                 shelter.CityName,
                 shelter.StreetName,
-                shelter.StreetNumber);
+                shelter.StreetNumber,
+                userId);
 
             return RedirectToAction("Index", "Home");
         }

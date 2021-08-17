@@ -3,7 +3,7 @@
     {
         var userId = UserManager.GetUserId(this.User);
 
-        @if (sheltersService.IsShelter(userId) && !this.User.IsInRole(AdminRoleName))
+        @if (this.User.IsInRole(ShelterRoleName) && !this.User.IsInRole(AdminRoleName))
         {
             <li class="nav-item">
                 <a class="nav-link text-dark" asp-area="" asp-controller="Pets" asp-action="MyPets">My pets</a>

@@ -49,11 +49,5 @@
 
         public string GetUserId()
             => httpContextAccessor.HttpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        public bool UserIsAdmin()
-            => httpContextAccessor.HttpContext.User.IsInRole(AdminRoleName);
-
-        public string GetUserEmail()
-            => httpContextAccessor.HttpContext.User?.FindFirstValue(ClaimTypes.Email);
     }
 }

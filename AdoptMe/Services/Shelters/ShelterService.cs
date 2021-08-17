@@ -6,8 +6,6 @@
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Services.Users;
 
-    using static Common.GlobalConstants.Roles;
-
     public class ShelterService : IShelterService
     {
         private readonly AdoptMeDbContext data;
@@ -19,8 +17,7 @@
             this.userService = userService;
         }
 
-        public int Create(string name, string phoneNumber, 
-            string cityName, string streetName, string streetNumber)
+        public int Create(string name, string phoneNumber, string cityName, string streetName, string streetNumber, string userId)
         {
             var cityData = this.data.Cities
                 .FirstOrDefault(c => c.Name == cityName);
@@ -57,9 +54,8 @@
 
             var shelterData = new Shelter
             {
-                UserId = this.userService.GetUserId(),
+                UserId = userId,
                 Name = name,
-                Email = this.userService.GetUserEmail(),
                 PhoneNumber = phoneNumber,
                 AddressId = addressData.Id,
                 RegistrationStatus = RequestStatus.Submitted

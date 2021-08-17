@@ -2,7 +2,7 @@
 {
     public interface IShelterService
     {
-        int Create(string name, string phoneNumber, string cityName, string streetName, string streetNumber);
+        int Create(string name, string phoneNumber, string cityName, string streetName, string streetNumber, string userId);
 
         public bool IsShelter(string userId);
 

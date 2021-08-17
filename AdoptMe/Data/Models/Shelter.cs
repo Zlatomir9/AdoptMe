@@ -17,9 +17,6 @@
         [Required]
         [MaxLength(PhoneMaxLength)]
         public string PhoneNumber { get; set; }
-        
-        [Required]
-        public string Email { get; set; }
 
         public RequestStatus RegistrationStatus { get; set; }
 
@@ -29,6 +26,8 @@
 
         [Required]
         public string UserId { get; set; }
+
+        public User User { get; set; }
 
         public IEnumerable<Pet> Pets { get; init; } = new List<Pet>();
     }

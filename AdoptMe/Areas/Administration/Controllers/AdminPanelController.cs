@@ -2,17 +2,26 @@
 {
     using System;
     using Microsoft.AspNetCore.Mvc;
-    using AdoptMe.Data.Models.Enums;
     using AdoptMe.Services.Administration;
     using AdoptMe.Models.Pets;
     using AdoptMe.Models.Shelters;
+    using AdoptMe.Services.Notifications;
+    using AdoptMe.Services.Shelters;
 
     public class AdminPanelController : AdministrationController
     {
         private readonly IAdministrationService administration;
+        private readonly INotificationService notificationService;
+        private readonly IShelterService shelterService;
 
-        public AdminPanelController(IAdministrationService administration)
-             => this.administration = administration;
+        public AdminPanelController(IAdministrationService administration,
+            INotificationService notificationService, 
+            IShelterService shelterService)
+        {
+            this.administration = administration;
+            this.notificationService = notificationService;
+            this.shelterService = shelterService;
+        }
 
         public IActionResult Index() => View();
 
@@ -37,6 +46,10 @@
 
             this.administration.AcceptRequest(id);
 
+            var shelter = this.shelterService.GetShelterById(id);
+
+            this.notificationService.AcceptShelterRegistrationNotification(shelter.Name, shelter.UserId);
+
             return this.RedirectToAction(nameof(RegistrationRequests));
         }
 
@@ -47,6 +60,10 @@
             {
                 return this.NotFound();
             }
+
+            var shelter = this.shelterService.GetShelterById(id);
+
+            this.notificationService.DeclineShelterRegistrationNotification(shelter.Name, shelter.UserId);
 
             this.administration.DeclineRequest(id);
 

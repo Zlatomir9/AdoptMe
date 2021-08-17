@@ -80,6 +80,12 @@
                    .Where(x => x.Id == id)
                    .Select(x => x.Shelter.UserId)
                    .FirstOrDefault();
+
+        public Shelter GetShelterById(int id)
+            => this.data
+                   .Shelters
+                   .Where(x => x.Id == id)
+                   .FirstOrDefault();
                    
     }
 }

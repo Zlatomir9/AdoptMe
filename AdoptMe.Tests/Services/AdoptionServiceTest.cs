@@ -348,5 +348,65 @@
 
             expected.Should().BeEquivalentTo(result);
         }
+
+        [Theory]
+        [InlineData(1, "PetName", "userId", 2, 3)]
+        public void DeclineAdoptionWhenPetIsDeletedOrAdoptedShouldDeclineAllSubmittedAdoptions(int petId, string petName, string userId, int firstAdopterId, int secondAdopterId)
+        {
+            var guid = Guid.NewGuid().ToString();
+
+            var options = new DbContextOptionsBuilder<AdoptMeDbContext>()
+                        .UseInMemoryDatabase(guid)
+                        .Options;
+
+            var db = new AdoptMeDbContext(options);
+
+            var pet = new Pet
+            {
+                Id = petId,
+                Name = petName
+            };
+
+            var firstAdopter = new Adopter
+            {
+                Id = firstAdopterId,
+                UserId = userId
+            };
+
+            var secondAdopter = new Adopter
+            {
+                Id = secondAdopterId,
+                UserId = userId
+            };
+
+            var firstApplication = new AdoptionApplication
+            {
+                PetId = petId,
+                RequestStatus = Submitted,
+                AdopterId = firstAdopterId
+            };
+
+            var secondApplication = new AdoptionApplication
+            {
+                PetId = petId,
+                RequestStatus = Submitted,
+                AdopterId = secondAdopterId
+            };
+
+            db.Pets.Add(pet);
+            db.Adopters.AddRange(firstAdopter, secondAdopter);
+            db.AdoptionApplications.AddRange(firstApplication, secondApplication);
+            db.SaveChanges();
+
+            var notificationService = new Mock<INotificationService>();
+            notificationService.Setup(u => u.DeclineAdoptionNotification(petName, firstAdopter.UserId));
+
+            var adoptionService = new AdoptionService(notificationService.Object, db);
+
+            adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(petId);
+
+            firstApplication.RequestStatus.Should().Be(Declined);
+            secondApplication.RequestStatus.Should().Be(Declined);
+        }
     }
 }

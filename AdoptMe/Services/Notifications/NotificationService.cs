@@ -122,5 +122,21 @@
 
             this.AddNotificationToUser(notification.Id, userId);
         }
+
+        public void AcceptShelterRegistrationNotification(string shelterName, string shelterUserId)
+        {
+            var message = $"Your request for registrating as {shelterName} shelter has been approved.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, shelterUserId);
+        }
+
+        public void DeclineShelterRegistrationNotification(string shelterName, string shelterUserId)
+        {
+            string message = $"Your request for registrating as {shelterName} shelter has been declined. You can send new request.";
+            var notification = this.Create(message);
+
+            this.AddNotificationToUser(notification.Id, shelterUserId);
+        }
     }
 }

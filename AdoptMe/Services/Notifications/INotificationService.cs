@@ -23,5 +23,9 @@
         public void DeclineAdoptionNotification(string petName, string userId);
 
         public void SentAdoptionNotification(string petName, string userId);
+
+        public void AcceptShelterRegistrationNotification(string shelterName, string shelterUserId);
+
+        public void DeclineShelterRegistrationNotification(string shelterName, string shelterUserId);
     }
 }

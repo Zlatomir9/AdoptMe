@@ -40,6 +40,10 @@
                     Id = x.Id,
                     Name = x.Name,
                     PhoneNumber = x.PhoneNumber,
+                    Email = this.data.Users
+                                     .Where(s => s.Id == x.UserId)
+                                     .Select(x => x.Email)
+                                     .FirstOrDefault(),
                     Address = this.data.Addresses
                                 .Where(a => a.Id == x.AddressId)
                                 .Select(a => new AddressViewModel
@@ -103,20 +107,12 @@
             shelter.RegistrationStatus = RequestStatus.Аccepted;
             this.userService.AddUserToRole(shelter.UserId, ShelterRoleName);
 
-            string message = $"Your request for registrating as {shelter.Name} shelter has been approved.";
-            var notification = notificationService.Create(message);
-            notificationService.AddNotificationToUser(notification.Id, shelter.UserId);
-
             this.data.SaveChanges();
         }
 
         public void DeclineRequest(int id)
         {
             var shelter = this.GetShelterById(id);
-
-            string message = $"Your request for registrating as {shelter.Name} shelter has been declined. You can send new request.";
-            var notification = notificationService.Create(message);
-            notificationService.AddNotificationToUser(notification.Id, shelter.UserId);
 
             this.data.Shelters.Remove(shelter);
             this.data.SaveChanges();

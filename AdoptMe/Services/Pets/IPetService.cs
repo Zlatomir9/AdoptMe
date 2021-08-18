@@ -9,7 +9,7 @@
     {
         AllPetsViewModel All(string species, string searchString, int pageIndex);
 
-        AllPetsViewModel MyPets(int pageIndex, string sortOrder);
+        AllPetsViewModel MyPets(int pageIndex, string sortOrder, string userId);
 
         PetDetailsViewModel Details(int id);
 

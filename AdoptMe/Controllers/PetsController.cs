@@ -210,9 +210,12 @@
             ViewBag.NameSortParm = sortOrder == "Name" ? "name_desc" : "Name";
             ViewBag.CurrentSort = sortOrder;
 
+            var userId = this.User.GetId();
+
             var queryResult = this.petService.MyPets(
                 query.PageIndex,
-                query.SortOrder);
+                query.SortOrder,
+                userId);
 
             query.TotalPets = queryResult.TotalPets;
             query.Pets = queryResult.Pets;

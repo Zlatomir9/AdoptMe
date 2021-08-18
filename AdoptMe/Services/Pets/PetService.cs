@@ -7,21 +7,15 @@
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
-    using AdoptMe.Services.Users;
 
     using static Common.GlobalConstants.PageSizes;
 
     public class PetService : IPetService
     {
         private readonly AdoptMeDbContext data;
-        private readonly IUserService userService;
-        
 
-        public PetService(AdoptMeDbContext data, IUserService userService)
-        {
-            this.data = data;
-            this.userService = userService;
-        }
+        public PetService(AdoptMeDbContext data)
+           => this.data = data;
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
         {
@@ -68,7 +62,7 @@
             };
         }
 
-        public AllPetsViewModel MyPets(int pageIndex, string sortOrder) 
+        public AllPetsViewModel MyPets(int pageIndex, string sortOrder, string userId)
         {
             var petsQuery = this.data.Pets.AsQueryable();
 
@@ -79,8 +73,6 @@
                 "name_desc" => petsQuery.OrderByDescending(p => p.Name),
                 _ => petsQuery.OrderByDescending(p => p.DateAdded),
             };
-            
-            var userId = this.userService.GetUserId();
 
             var pets = petsQuery
                 .Where(x => x.Shelter.UserId == userId)
@@ -189,7 +181,7 @@
 
             petData.IsDeleted = true;
 
-            this.data.SaveChanges();            
+            this.data.SaveChanges();
         }
 
         public void IsAdopted(int id)

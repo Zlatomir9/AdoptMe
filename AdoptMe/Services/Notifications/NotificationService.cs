@@ -12,9 +12,7 @@
         private readonly AdoptMeDbContext data;
 
         public NotificationService(AdoptMeDbContext data)
-        {
-            this.data = data;
-        }
+            => this.data = data;
 
         public Notification Create(string message)
         {

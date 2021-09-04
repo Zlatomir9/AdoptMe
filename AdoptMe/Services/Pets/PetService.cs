@@ -94,7 +94,7 @@
             return new AllPetsViewModel
             {
                 Pets = pets,
-                TotalPets = petsQuery.Count()
+                TotalPets = pets.Count()
             };
         }
 

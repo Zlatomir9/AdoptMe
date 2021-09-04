@@ -107,7 +107,7 @@
                 ImageUrl = imageUrl,
                 SpeciesId = speciesId,
                 ShelterId = shelterId,
-                DateAdded = DateTime.UtcNow,
+                DateAdded = DateTime.UtcNow
             };
 
             this.data.Pets.Add(petData);
@@ -165,11 +165,7 @@
         public IEnumerable<PetSpeciesModel> AllSpecies()
            => this.data
                .Species
-               .Select(c => new PetSpeciesModel
-               {
-                   Id = c.Id,
-                   Name = c.Name
-               })
+               .ProjectTo<PetSpeciesModel>(this.mapper)
                .ToList();
 
         public bool AddedByShelter(int petId, string userId)

@@ -160,6 +160,7 @@
                     RegistrationStatus = Data.Models.Enums.RequestStatus.Аccepted,
                     PhoneNumber = "+359 888 777 555",
                     UserId = user.Id,
+                    Email = user.Email,
                     AddressId = 1
                 };
 

@@ -47,12 +47,19 @@
                 this.data.SaveChanges();
             }
 
+            var userEmail = this.data
+                    .Users
+                    .Where(x => x.Id == userId)
+                    .Select(x => x.Email)
+                    .FirstOrDefault();
+
             var shelterData = new Shelter
             {
                 UserId = userId,
                 Name = name,
                 PhoneNumber = phoneNumber,
                 AddressId = addressData.Id,
+                Email = userEmail,
                 RegistrationStatus = RequestStatus.Submitted
             };
 

@@ -3,6 +3,8 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
@@ -13,9 +15,13 @@
     public class PetService : IPetService
     {
         private readonly AdoptMeDbContext data;
+        private readonly IConfigurationProvider mapper;
 
-        public PetService(AdoptMeDbContext data)
-           => this.data = data;
+        public PetService(AdoptMeDbContext data, IConfigurationProvider mapper)
+        {
+            this.data = data;
+            this.mapper = mapper;
+        }
 
         public AllPetsViewModel All(string species, string searchString, int pageIndex)
         {
@@ -26,28 +32,20 @@
 
             if (!string.IsNullOrEmpty(species))
             {
-                petsQuery = petsQuery.Where(s => s.Species.Name == species);
+                petsQuery = petsQuery
+                    .Where(s => s.Species.Name == species);
             }
 
             if (!string.IsNullOrEmpty(searchString))
             {
-                petsQuery = petsQuery.Where(s => s.Breed.Contains(searchString));
+                petsQuery = petsQuery
+                    .Where(s => s.Breed.Contains(searchString));
             }
 
             var totalPets = petsQuery.Count();
 
             var pets = petsQuery
-                .Select(x => new PetDetailsViewModel
-                {
-                    Id = x.Id,
-                    Species = x.Species.ToString(),
-                    Breed = x.Breed,
-                    ImageUrl = x.ImageUrl,
-                    Name = x.Name,
-                    Age = x.Age.ToString(),
-                    Gender = x.Gender.ToString(),
-                    DateAdded = x.DateAdded
-                })
+                .ProjectTo<PetDetailsViewModel>(this.mapper)
                 .OrderBy(d => d.DateAdded)
                 .Skip((pageIndex - 1) * AllPetsPageSize)
                 .Take(AllPetsPageSize)
@@ -76,17 +74,7 @@
 
             var pets = petsQuery
                 .Where(x => x.Shelter.UserId == userId)
-                .Select(x => new PetDetailsViewModel
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Species = x.Species.Name,
-                    Breed = x.Breed,
-                    ImageUrl = x.ImageUrl,
-                    DateAdded = x.DateAdded,
-                    IsAdopted = x.IsAdopted,
-                    IsDeleted = x.IsDeleted
-                })
+                .ProjectTo<PetDetailsViewModel>(this.mapper)
                 .Skip((pageIndex - 1) * MyPetsPageSize)
                 .Take(MyPetsPageSize)
                 .ToList();
@@ -102,28 +90,7 @@
             => this.data
                    .Pets
                    .Where(p => p.Id == id)
-                   .Select(p => new PetDetailsViewModel
-                   {
-                       Id = p.Id,
-                       Age = p.Age.ToString(),
-                       Breed = p.Breed,
-                       Color = p.Color,
-                       Gender = p.Gender.ToString(),
-                       MyStory = p.MyStory,
-                       Name = p.Name,
-                       ImageUrl = p.ImageUrl,
-                       Species = p.Species.ToString(),
-                       ShelterName = p.Shelter.Name,
-                       ShelterPhoneNumber = p.Shelter.PhoneNumber,
-                       ShelterEmail = this.data.Users
-                                          .Where(x => x.Id == p.Shelter.UserId)
-                                          .Select(x => x.Email)
-                                          .FirstOrDefault(),
-                       UserId = p.Shelter.UserId,
-                       SpeciesId = p.SpeciesId,
-                       IsAdopted = p.IsAdopted,
-                       IsDeleted = p.IsDeleted
-                   })
+                   .ProjectTo<PetDetailsViewModel>(this.mapper)
                    .FirstOrDefault();
 
         public int Add(string name, Age age, string breed, string color, Gender gender,

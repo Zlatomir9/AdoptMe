@@ -18,6 +18,9 @@
         [MaxLength(PhoneMaxLength)]
         public string PhoneNumber { get; set; }
 
+        [Required]
+        public string Email { get; set; }
+
         public RequestStatus RegistrationStatus { get; set; }
 
         public int AddressId { get; set; }

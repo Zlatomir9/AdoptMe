@@ -8,7 +8,6 @@
     using AdoptMe.Models.Pets;
     using AdoptMe.Services.Pets;
     using AdoptMe.Services.Shelters;
-    using AdoptMe.Services.Users;
     using AdoptMe.Services.Notifications;
     using AdoptMe.Services.Adoptions;
 

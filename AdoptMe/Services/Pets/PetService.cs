@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
     using AdoptMe.Data;
@@ -11,6 +12,7 @@
     using AdoptMe.Models.Pets;
 
     using static Common.GlobalConstants.PageSizes;
+    using System.Threading.Tasks;
 
     public class PetService : IPetService
     {
@@ -23,7 +25,7 @@
             this.mapper = mapper;
         }
 
-        public AllPetsViewModel All(string species, string searchString, int pageIndex)
+        public async Task<AllPetsViewModel> All(string species, string searchString, int pageIndex)
         {
             var petsQuery = this.data
                     .Pets
@@ -44,12 +46,12 @@
 
             var totalPets = petsQuery.Count();
 
-            var pets = petsQuery
+            var pets = await petsQuery
                 .ProjectTo<PetDetailsViewModel>(this.mapper)
                 .OrderBy(d => d.DateAdded)
                 .Skip((pageIndex - 1) * AllPetsPageSize)
                 .Take(AllPetsPageSize)
-                .ToList();
+                .ToListAsync();
 
             return new AllPetsViewModel
             {
@@ -86,14 +88,14 @@
             };
         }
 
-        public PetDetailsViewModel Details(int id)
-            => this.data
+        public async Task<PetDetailsViewModel> Details(int id)
+            => await this.data
                    .Pets
                    .Where(p => p.Id == id)
                    .ProjectTo<PetDetailsViewModel>(this.mapper)
-                   .FirstOrDefault();
+                   .FirstOrDefaultAsync();
 
-        public int Add(string name, Age age, string breed, string color, Gender gender,
+        public async Task<int> Add(string name, Age age, string breed, string color, Gender gender,
             string myStory, string imageUrl, int speciesId, int shelterId)
         {
             var petData = new Pet
@@ -110,13 +112,13 @@
                 DateAdded = DateTime.UtcNow
             };
 
-            this.data.Pets.Add(petData);
-            this.data.SaveChanges();
+            await this.data.Pets.AddAsync(petData);
+            await this.data.SaveChangesAsync();
 
             return petData.Id;
         }
 
-        public bool Edit(int id, string name, Age age, string breed, string color, Gender gender,
+        public async Task<bool> Edit(int id, string name, Age age, string breed, string color, Gender gender,
                     string myStory, string imageUrl, int speciesId)
         {
             var petData = this.data.Pets.FirstOrDefault(x => x.Id == id);
@@ -135,7 +137,7 @@
             petData.ImageUrl = imageUrl;
             petData.SpeciesId = speciesId;
 
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
 
             return true;
         }
@@ -162,11 +164,11 @@
             this.data.SaveChanges();
         }
 
-        public IEnumerable<PetSpeciesModel> AllSpecies()
-           => this.data
+        public async Task<IEnumerable<PetSpeciesModel>> AllSpecies()
+           => await this.data
                .Species
                .ProjectTo<PetSpeciesModel>(this.mapper)
-               .ToList();
+               .ToListAsync();
 
         public bool AddedByShelter(int petId, string userId)
             => this.data

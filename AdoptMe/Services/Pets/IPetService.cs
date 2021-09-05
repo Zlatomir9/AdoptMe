@@ -1,29 +1,30 @@
 ﻿namespace AdoptMe.Services.Pets
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
 
     public interface IPetService
     {
-        AllPetsViewModel All(string species, string searchString, int pageIndex);
+        Task<AllPetsViewModel> All(string species, string searchString, int pageIndex);
 
         AllPetsViewModel MyPets(int pageIndex, string sortOrder, string userId);
 
-        PetDetailsViewModel Details(int id);
+        Task<PetDetailsViewModel> Details(int id);
 
-        int Add(string name, Age age, string breed, string color, Gender gender, string myStory, 
+        Task<int> Add(string name, Age age, string breed, string color, Gender gender, string myStory, 
                 string imageUrl, int speciesId, int shelterId);
 
-        bool Edit(int id, string name, Age age, string breed, string color, Gender gender,
+        Task<bool> Edit(int id, string name, Age age, string breed, string color, Gender gender,
                 string myStory, string imageUrl, int speciesId);
 
         public void Delete(int id);
 
         public void IsAdopted(int id);
 
-        IEnumerable<PetSpeciesModel> AllSpecies();
+        Task<IEnumerable<PetSpeciesModel>> AllSpecies();
 
         bool AddedByShelter(int petId, string userId);
 

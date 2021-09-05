@@ -1,6 +1,7 @@
 ﻿namespace AdoptMe.Controllers
 {
     using System;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using AutoMapper;
@@ -34,11 +35,11 @@
             this.adoptionService = adoptionService;
         }
 
-        public IActionResult All(AllPetsViewModel query)
+        public async Task<IActionResult> All(AllPetsViewModel query)
         {
-            var species = this.petService.AllSpecies();
+            var species = await this.petService.AllSpecies();
 
-            var queryResult = this.petService.All(
+            var queryResult = await this.petService.All(
                 query.Species,
                 query.SearchString,
                 query.PageIndex);
@@ -50,27 +51,26 @@
             return View(query);
         }
 
-        public IActionResult Details(PetDetailsViewModel model)
+        public async Task<IActionResult> Details(PetDetailsViewModel model)
         {
-           var modelResult = this.petService
-                .Details(model.Id);
+           var modelResult = await this.petService.Details(model.Id);
 
            return View(modelResult);
         }
 
         [Authorize]
         [Authorize(Roles = ShelterRoleName)]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
             return View(new PetFormModel
             {
-                AllSpecies = this.petService.AllSpecies()
+                AllSpecies = await this.petService.AllSpecies()
             });
         }
 
         [HttpPost]
         [Authorize(Roles = ShelterRoleName)]
-        public IActionResult Add(PetFormModel pet)
+        public async Task<IActionResult> Add(PetFormModel pet)
         {
             if (!this.petService.SpeciesExists(pet.SpeciesId))
             {
@@ -79,7 +79,7 @@
 
             if (!ModelState.IsValid)
             {
-                pet.AllSpecies = this.petService.AllSpecies();
+                pet.AllSpecies = await this.petService.AllSpecies();
 
                 return View(pet);
             }
@@ -87,7 +87,7 @@
             var shelterId = this.shelterService
                 .IdByUser(this.User.GetId());
 
-            this.petService.Add(
+            await this.petService.Add(
                 pet.Name,
                 pet.Age,
                 pet.Breed,
@@ -102,7 +102,7 @@
         }
 
         [Authorize]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var userId = this.User.GetId();
 
@@ -111,7 +111,7 @@
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
 
-            var pet = this.petService.Details(id);
+            var pet = await this.petService.Details(id);
 
             if (pet.UserId != userId && !User.IsAdmin())
             {
@@ -119,14 +119,14 @@
             }
 
             var petForm = this.mapper.Map<PetFormModel>(pet);
-            petForm.AllSpecies = this.petService.AllSpecies();
+            petForm.AllSpecies = await this.petService.AllSpecies();
 
             return View(petForm);
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult Edit(int id, PetFormModel pet)
+        public async Task<IActionResult> Edit(int id, PetFormModel pet)
         {
             if (!User.IsInRole(ShelterRoleName) 
                 && !User.IsInRole(AdminRoleName))
@@ -147,12 +147,12 @@
 
             if (!ModelState.IsValid)
             {
-                pet.AllSpecies = this.petService.AllSpecies();
+                pet.AllSpecies = await this.petService.AllSpecies();
 
                 return View(pet);
             }
 
-            this.petService.Edit(
+            await this.petService.Edit(
                 id,
                 pet.Name,
                 pet.Age,

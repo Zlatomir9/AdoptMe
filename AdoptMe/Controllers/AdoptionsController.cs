@@ -2,6 +2,7 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
+    using System.Threading.Tasks;
     using AdoptMe.Models.Pets;
     using AdoptMe.Infrastructure;
     using AdoptMe.Services.Adoptions;
@@ -54,7 +55,7 @@
 
         [HttpPost]
         [Authorize(Roles = AdopterRoleName)]
-        public IActionResult AdoptionApplication(int id, AdoptionFormModel adoption)
+        public async Task<IActionResult> AdoptionApplication(int id, AdoptionFormModel adoption)
         {
             if (!ModelState.IsValid)
             {
@@ -71,7 +72,7 @@
                 id,
                 userId);
 
-            var pet = this.petService.GetPetById(id);
+            var pet = await this.petService.GetPetById(id);
             var shelterUserId = this.shelterService.GetShelterUserIdByPet(id);
 
             this.notificationService.SentAdoptionNotification(pet.Name, shelterUserId);
@@ -94,11 +95,11 @@
         }
 
         [Authorize]
-        public IActionResult AdoptionApplicationDetails(AdoptionDetailsViewModel model)
+        public async Task<IActionResult> AdoptionApplicationDetails(AdoptionDetailsViewModel model)
         {
             var modelResult = this.adoptionService.Details(model.Id);
 
-            if (!this.petService.AddedByShelter(modelResult.PetId, User.GetId()))
+            if (!await this.petService.AddedByShelter(modelResult.PetId, User.GetId()))
             {
                 return BadRequest();
             }
@@ -108,7 +109,7 @@
 
         [HttpPost]
         [Authorize]
-        public IActionResult ApproveAdoption(int id)
+        public async Task<IActionResult> ApproveAdoption(int id)
         {
             if (id == 0)
             {
@@ -120,7 +121,7 @@
             var pet = this.adoptionService.GetPetByAdoptionId(id);
             var adopter = this.adoptionService.GetAdopterByAdoptionId(id);
 
-            this.petService.IsAdopted(pet.Id);
+            await this.petService.IsAdopted(pet.Id);
             this.notificationService.ApproveAdoptionNotification(pet.Name, adopter.UserId);
             this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(pet.Id);
 

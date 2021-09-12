@@ -1,16 +1,19 @@
 ﻿namespace AdoptMe.Tests.Services
 {
     using Xunit;
+    using System;
     using System.Linq;
     using System.Collections.Generic;
-    using System;
+    using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using FluentAssertions;
+    using AutoMapper;
     using AdoptMe.Services.Pets;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Models.Pets;
+    using AdoptMe.Infrastructure;
 
     public class PetServiceTest
     {
@@ -19,7 +22,7 @@
                     "Behold 12-year-old SIR NEKO! Like any true gentleman, he knows his manners, Sit, Stay, Come. His beard may be frosted, but he still enjoys a good game of fetch or a nicely paced stroll on the trail",
                     "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/YellowLabradorLooking_new.jpg/250px-YellowLabradorLooking_new.jpg",
                     1, 1)]
-        public void AddMethodShouldAddPetInDatabase(string name,
+        public async Task AddMethodShouldAddPetInDatabase(string name,
             Age age, string breed,
             string color,
             Gender gender,
@@ -38,9 +41,9 @@
 
             var petService = new PetService(db, null);
 
-            var pet = petService.Add(name, age, breed, color, gender, myStory, imageUrl, speciesId, shelterId);
+            var pet = await petService.Add(name, age, breed, color, gender, myStory, imageUrl, speciesId, shelterId);
 
-            var actualPet = db.Pets.FirstOrDefault(x => x.Id == pet);
+            var actualPet = await db.Pets.FirstOrDefaultAsync(x => x.Id == pet);
 
             pet.Should().Be(1);
             db.Pets.Should().HaveCount(1);
@@ -53,7 +56,7 @@
             "Behold 12-year-old SIR NEKO! Like any true gentleman, he knows his manners, Sit, Stay, Come. His beard may be frosted, but he still enjoys a good game of fetch or a nicely paced stroll on the trail",
             "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/YellowLabradorLooking_new.jpg/250px-YellowLabradorLooking_new.jpg",
             1)]
-        public void EditMethodShouldChangePetData(int id,
+        public async Task EditMethodShouldChangePetData(int id,
                     string name,
                     Age age,
                     string breed,
@@ -89,7 +92,7 @@
 
             var petService = new PetService(db, null);
 
-            petService.Edit(id, name, Age.Young, breed, color, gender, myStory, imageUrl, speciesId);
+            await petService.Edit(id, name, Age.Young, breed, color, gender, myStory, imageUrl, speciesId);
 
             var result = db.Pets.FirstOrDefault(x => x.Id == pet.Id);
 
@@ -111,7 +114,7 @@
 
         [Theory]
         [InlineData(3)]
-        public void DeleteShouldSetIsDeletedToTrue(int id)
+        public async Task DeleteShouldSetIsDeletedToTrue(int id)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -139,7 +142,7 @@
 
             var petService = new PetService(db, null);
 
-            petService.Delete(3);
+            await petService.Delete(3);
 
             var result = db.Pets.FirstOrDefault(x => x.Id == id);
 
@@ -147,7 +150,7 @@
         }
 
         [Fact]
-        public void GetAllSpeciesMethodShouldReturnAllSpeciesFromDb()
+        public async Task GetAllSpeciesMethodShouldReturnAllSpeciesFromDb()
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -156,6 +159,16 @@
                         .Options;
 
             var db = new AdoptMeDbContext(options);
+
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
             var species = new List<Species>
             {
@@ -176,11 +189,11 @@
                 }
             };
 
-            db.Species.AddRange(species);
-            db.SaveChanges();
+            await db.Species.AddRangeAsync(species);
+            await db.SaveChangesAsync();
 
-            var petService = new PetService(db, null);
-            var result = petService.AllSpecies();
+            var petService = new PetService(db, autoMapper);
+            var result = await petService.AllSpecies();
 
             var expected = new List<PetSpeciesModel>
             {
@@ -208,7 +221,7 @@
 
         [Theory]
         [InlineData(22, "shelter")]
-        public void AddedByShelterMethodShouldReturnTrueIfPetIsAddedByShelter(int petId, string userId)
+        public async Task AddedByShelterMethodShouldReturnTrueIfPetIsAddedByShelter(int petId, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -236,7 +249,7 @@
             db.SaveChanges();
 
             var petService = new PetService(db, null);
-            var result = petService.AddedByShelter(petId, userId);
+            var result = await petService.AddedByShelter(petId, userId);
 
             result.Should().BeTrue();
         }
@@ -271,7 +284,7 @@
 
         [Theory]
         [InlineData(1)]
-        public void GetPetByIdShouldReturnPet(int petId)
+        public async Task GetPetByIdShouldReturnPet(int petId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -286,13 +299,13 @@
                 Id = petId
             };
 
-            db.Pets.Add(pet);
-            db.SaveChanges();
+            await db.Pets.AddAsync(pet);
+            await db.SaveChangesAsync();
 
             var petService = new PetService(db, null);
-            var result = petService.GetPetById(petId);
+            var result = await petService.GetPetById(petId);
 
-            var expected = db.Pets.FirstOrDefault(x => x.Id == petId);
+            var expected = await db.Pets.FirstOrDefaultAsync(x => x.Id == petId);
 
             result.Should().BeEquivalentTo(expected);
         }

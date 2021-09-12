@@ -62,7 +62,7 @@
             };
         }
 
-        public AllPetsViewModel MyPets(int pageIndex, string sortOrder, string userId)
+        public async Task<AllPetsViewModel> MyPets(int pageIndex, string sortOrder, string userId)
         {
             var petsQuery = this.data.Pets.AsQueryable();
 
@@ -74,12 +74,12 @@
                 _ => petsQuery.OrderByDescending(p => p.DateAdded),
             };
 
-            var pets = petsQuery
+            var pets = await petsQuery
                 .Where(x => x.Shelter.UserId == userId)
                 .ProjectTo<PetDetailsViewModel>(this.mapper)
                 .Skip((pageIndex - 1) * MyPetsPageSize)
                 .Take(MyPetsPageSize)
-                .ToList();
+                .ToListAsync();
 
             return new AllPetsViewModel
             {
@@ -153,7 +153,7 @@
             await this.data.SaveChangesAsync();
         }
 
-        public void IsAdopted(int id)
+        public async Task IsAdopted(int id)
         {
             var petData = this.data
                     .Pets
@@ -161,7 +161,7 @@
 
             petData.IsAdopted = true;
 
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<PetSpeciesModel>> AllSpecies()
@@ -170,19 +170,19 @@
                .ProjectTo<PetSpeciesModel>(this.mapper)
                .ToListAsync();
 
-        public bool AddedByShelter(int petId, string userId)
-            => this.data
+        public async Task<bool> AddedByShelter(int petId, string userId)
+            => await this.data
                 .Pets
-                .Any(c => c.Id == petId && c.Shelter.UserId == userId);
+                .AnyAsync(c => c.Id == petId && c.Shelter.UserId == userId);
 
         public bool SpeciesExists(int speciesId)
             => this.data
                 .Species
                 .Any(c => c.Id == speciesId);
 
-        public Pet GetPetById(int id)
-            => this.data
+        public async Task<Pet> GetPetById(int id)
+            => await this.data
                 .Pets
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
     }
 }

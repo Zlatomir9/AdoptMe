@@ -134,7 +134,7 @@
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
 
-            if (!this.petService.AddedByShelter(id, User.GetId()) 
+            if (!await this.petService.AddedByShelter(id, User.GetId()) 
                 && !User.IsInRole(AdminRoleName))
             {
                 return BadRequest();
@@ -176,9 +176,9 @@
         [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
-            var pet = this.petService.GetPetById(id);
+            var pet = await this.petService.GetPetById(id);
 
-            if (!this.petService.AddedByShelter(id, User.GetId()) 
+            if (!await this.petService.AddedByShelter(id, User.GetId()) 
                 && !User.IsInRole(AdminRoleName))
             {
                 return BadRequest();
@@ -203,7 +203,7 @@
         }
 
         [Authorize(Roles = ShelterRoleName)]
-        public IActionResult MyPets(AllPetsViewModel query, string sortOrder)
+        public async Task<IActionResult> MyPets(AllPetsViewModel query, string sortOrder)
         {
             ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "Date" : "";
             ViewBag.NameSortParm = sortOrder == "Name" ? "name_desc" : "Name";
@@ -211,7 +211,7 @@
 
             var userId = this.User.GetId();
 
-            var queryResult = this.petService.MyPets(
+            var queryResult = await this.petService.MyPets(
                 query.PageIndex,
                 query.SortOrder,
                 userId);

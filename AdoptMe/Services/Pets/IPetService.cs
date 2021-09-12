@@ -20,7 +20,7 @@
         Task<bool> Edit(int id, string name, Age age, string breed, string color, Gender gender,
                 string myStory, string imageUrl, int speciesId);
 
-        public void Delete(int id);
+        Task Delete(int id);
 
         public void IsAdopted(int id);
 

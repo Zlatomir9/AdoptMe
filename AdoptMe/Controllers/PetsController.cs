@@ -174,7 +174,7 @@
 
         [HttpPost]
         [Authorize]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var pet = this.petService.GetPetById(id);
 
@@ -189,7 +189,7 @@
                 return BadRequest();
             }
 
-            this.petService.Delete(id);
+            await this.petService.Delete(id);
 
             this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(id);
 

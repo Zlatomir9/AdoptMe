@@ -3,6 +3,7 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
@@ -12,7 +13,6 @@
     using AdoptMe.Models.Pets;
 
     using static Common.GlobalConstants.PageSizes;
-    using System.Threading.Tasks;
 
     public class PetService : IPetService
     {
@@ -142,7 +142,7 @@
             return true;
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
             var petData = this.data
                     .Pets
@@ -150,7 +150,7 @@
 
             petData.IsDeleted = true;
 
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
         }
 
         public void IsAdopted(int id)

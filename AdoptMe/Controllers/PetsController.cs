@@ -104,13 +104,12 @@
         [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
-            var userId = this.User.GetId();
-
             if (!User.IsShelter() && !User.IsAdmin())
             {
                 return RedirectToAction(nameof(SheltersController.Create), "Shelters");
             }
 
+            var userId = this.User.GetId();
             var pet = await this.petService.Details(id);
 
             if (pet.UserId != userId && !User.IsAdmin())
@@ -165,8 +164,8 @@
 
             if (User.IsInRole(AdminRoleName))
             {
-               var shelterUserId = shelterService.GetShelterUserIdByPet(id);
-               this.notificationService.PetEditByAdminNotification(pet.Name, shelterUserId);
+               var shelterUserId = await shelterService.GetShelterUserIdByPet(id);
+               await this.notificationService.PetEditByAdminNotification(pet.Name, shelterUserId);
             }
 
             return RedirectToAction(nameof(All));
@@ -191,12 +190,12 @@
 
             await this.petService.Delete(id);
 
-            this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(id);
+            await this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(id);
 
             if (User.IsInRole(AdminRoleName))
             {
-                var shelterUserId = shelterService.GetShelterUserIdByPet(id);
-                this.notificationService.PetDeletedByAdminNotification(pet.Name, shelterUserId);
+                var shelterUserId = await shelterService.GetShelterUserIdByPet(id);
+                await this.notificationService.PetDeletedByAdminNotification(pet.Name, shelterUserId);
             }
 
             return RedirectToAction(nameof(All));

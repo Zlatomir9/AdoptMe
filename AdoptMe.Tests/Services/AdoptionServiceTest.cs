@@ -2,10 +2,13 @@
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using Moq;
     using Xunit;
     using FluentAssertions;
-    using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
+    using AdoptMe.Infrastructure;
     using AdoptMe.Data;
     using AdoptMe.Services.Adoptions;
     using AdoptMe.Data.Models;
@@ -17,7 +20,7 @@
     {
         [Theory]
         [InlineData("FirstQuestion", "SecondQuestion", "ThirdQuestion", "FourthQuestion", 1, "userId")]
-        public void CreateAdoptionShouldAddAdoptionInTheDatabase(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int petId, string userId)
+        public async Task CreateAdoptionShouldAddAdoptionInTheDatabase(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int petId, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -27,17 +30,22 @@
 
             var db = new AdoptMeDbContext(options);
 
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
+
             var adopter = new Adopter
             {
                 UserId = userId
             };
 
-            db.Adopters.Add(adopter);
-            db.SaveChanges();
+            await db.Adopters.AddAsync(adopter);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
 
-            var adoption = adoptionService.CreateAdoption(firstQuestion, secondQuestion, thirdQuestion, fourthQuestion, petId, userId);
+            var adoption = await adoptionService.CreateAdoption(firstQuestion, secondQuestion, thirdQuestion, fourthQuestion, petId, userId);
 
             adoption.Should().Be(1);
             db.AdoptionApplications.Should().NotBeEmpty();
@@ -49,7 +57,7 @@
         [InlineData(1)]
         [InlineData(2)]
         [InlineData(3)]
-        public void ApproveAdoptionShouldChangeAdoptionStatus(int adoptionId)
+        public async Task ApproveAdoptionShouldChangeAdoptionStatus(int adoptionId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -65,12 +73,18 @@
                 RequestStatus = Submitted
             };
 
-            db.AdoptionApplications.Add(adoptionAplication);
-            db.SaveChanges();
+            await db.AdoptionApplications.AddAsync(adoptionAplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            adoptionService.ApproveAdoption(adoptionId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            await adoptionService.ApproveAdoption(adoptionId);
 
             var expected = new AdoptionApplication
             {
@@ -85,7 +99,7 @@
         [InlineData(1)]
         [InlineData(2)]
         [InlineData(3)]
-        public void DeclineAdoptionShouldChangeAdoptionStatus(int adoptionId)
+        public async Task DeclineAdoptionShouldChangeAdoptionStatus(int adoptionId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -101,12 +115,17 @@
                 RequestStatus = Submitted
             };
 
-            db.AdoptionApplications.Add(adoptionAplication);
-            db.SaveChanges();
+            await db.AdoptionApplications.AddAsync(adoptionAplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            adoptionService.DeclineAdoption(adoptionId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            await adoptionService.DeclineAdoption(adoptionId);
 
             var expected = new AdoptionApplication
             {
@@ -119,7 +138,7 @@
 
         [Theory]
         [InlineData(1, "user1")]
-        public void SentApplicationShouldReturnTrueIfAdopterSentApplicationForPet(int petId, string userId)
+        public async Task SentApplicationShouldReturnTrueIfAdopterSentApplicationForPet(int petId, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -146,21 +165,26 @@
                 RequestStatus = Submitted
             };
 
-            db.Pets.Add(pet);
-            db.Adopters.Add(adopter);
-            db.AdoptionApplications.Add(adoptionAplication);
-            db.SaveChanges();
+            await db.Pets.AddAsync(pet);
+            await db.Adopters.AddAsync(adopter);
+            await db.AdoptionApplications.AddAsync(adoptionAplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            var result = adoptionService.SentApplication(adoptionAplication.PetId, adoptionAplication.Adopter.UserId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            var result = await adoptionService.SentApplication(adoptionAplication.PetId, adoptionAplication.Adopter.UserId);
 
             result.Should().BeTrue();
         }
 
         [Theory]
         [InlineData(1, "user1")]
-        public void SentApplicationShouldReturnFalse(int petId, string userId)
+        public async Task SentApplicationShouldReturnFalse(int petId, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -187,21 +211,26 @@
                 RequestStatus = Аccepted
             };
 
-            db.Pets.Add(pet);
-            db.Adopters.Add(adopter);
-            db.AdoptionApplications.Add(adoptionAplication);
-            db.SaveChanges();
+            await db.Pets.AddAsync(pet);
+            await db.Adopters.AddAsync(adopter);
+            await db.AdoptionApplications.AddAsync(adoptionAplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            var result = adoptionService.SentApplication(adoptionAplication.PetId, adoptionAplication.Adopter.UserId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            var result = await adoptionService.SentApplication(adoptionAplication.PetId, adoptionAplication.Adopter.UserId);
 
             result.Should().BeFalse();
         }
 
         [Theory]
         [InlineData(1)]
-        public void GetAdoptionShouldReturnAdoption(int adoptionId)
+        public async Task GetAdoptionShouldReturnAdoption(int adoptionId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -216,12 +245,17 @@
                 Id = adoptionId
             };
 
-            db.AdoptionApplications.Add(adoptionAplication);
-            db.SaveChanges();
+            await db.AdoptionApplications.AddAsync(adoptionAplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            var result = adoptionService.GetAdoption(adoptionId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            var result = await adoptionService.GetAdoption(adoptionId);
 
             var expected = new AdoptionApplication
             {
@@ -235,7 +269,7 @@
         [Theory]
         [InlineData(1)]
         [InlineData(21)]
-        public void SubmittedAdoptionsShouldWorkCorrectly(int petId)
+        public async Task SubmittedAdoptionsShouldWorkCorrectly(int petId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -262,13 +296,18 @@
                 RequestStatus = Submitted
             };
 
-            db.Pets.Add(pet);
-            db.AdoptionApplications.AddRange(firstAplication, secondAplication);
-            db.SaveChanges();
+            await db.Pets.AddAsync(pet);
+            await db.AdoptionApplications.AddRangeAsync(firstAplication, secondAplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            var result = adoptionService.SubmittedPetAdoptionApplications(petId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            var result = await adoptionService.SubmittedPetAdoptionApplications(petId);
 
             result.Should().HaveCount(2);
         }
@@ -276,7 +315,7 @@
         [Theory]
         [InlineData(1, "firstName", 1)]
         [InlineData(21, "firstNameee", 1)]
-        public void GetAdopterIdByAdoptionIdShouldWorkCorrectly(int adoptionId, string firstName, int adopterId)
+        public async Task GetAdopterIdByAdoptionIdShouldWorkCorrectly(int adoptionId, string firstName, int adopterId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -298,13 +337,18 @@
                 AdopterId = adopterId
             };
 
-            db.Adopters.Add(adopter);
-            db.AdoptionApplications.Add(aplication);
-            db.SaveChanges();
+            await db.Adopters.AddAsync(adopter);
+            await db.AdoptionApplications.AddAsync(aplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            var result = adoptionService.GetAdopterByAdoptionId(adoptionId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            var result = await adoptionService.GetAdopterByAdoptionId(adoptionId);
 
             var expected = db.Adopters.FirstOrDefault();
 
@@ -314,7 +358,7 @@
         [Theory]
         [InlineData(1, "firstName", 1)]
         [InlineData(21, "firstNameee", 1)]
-        public void GetPetIdByAdoptionIdShouldWorkCorrectly(int adoptionId, string petName, int petId)
+        public async Task GetPetIdByAdoptionIdShouldWorkCorrectly(int adoptionId, string petName, int petId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -336,13 +380,18 @@
                 PetId = petId
             };
 
-            db.Pets.Add(pet);
-            db.AdoptionApplications.Add(aplication);
-            db.SaveChanges();
+            await db.Pets.AddAsync(pet);
+            await db.AdoptionApplications.AddAsync(aplication);
+            await db.SaveChangesAsync();
 
-            var adoptionService = new AdoptionService(null, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            var result = adoptionService.GetPetByAdoptionId(adoptionId);
+            var adoptionService = new AdoptionService(null, autoMapper, db);
+
+            var result = await adoptionService.GetPetByAdoptionId(adoptionId);
 
             var expected = db.Pets.FirstOrDefault();
 
@@ -351,7 +400,7 @@
 
         [Theory]
         [InlineData(1, "PetName", "userId", 2, 3)]
-        public void DeclineAdoptionWhenPetIsDeletedOrAdoptedShouldDeclineAllSubmittedAdoptions(int petId, string petName, string userId, int firstAdopterId, int secondAdopterId)
+        public async Task DeclineAdoptionWhenPetIsDeletedOrAdoptedShouldDeclineAllSubmittedAdoptions(int petId, string petName, string userId, int firstAdopterId, int secondAdopterId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -393,17 +442,22 @@
                 AdopterId = secondAdopterId
             };
 
-            db.Pets.Add(pet);
-            db.Adopters.AddRange(firstAdopter, secondAdopter);
-            db.AdoptionApplications.AddRange(firstApplication, secondApplication);
-            db.SaveChanges();
+            await db.Pets.AddAsync(pet);
+            await db.Adopters.AddRangeAsync(firstAdopter, secondAdopter);
+            await db.AdoptionApplications.AddRangeAsync(firstApplication, secondApplication);
+            await db.SaveChangesAsync();
 
             var notificationService = new Mock<INotificationService>();
             notificationService.Setup(u => u.DeclineAdoptionNotification(petName, firstAdopter.UserId));
 
-            var adoptionService = new AdoptionService(notificationService.Object, db);
+            var autoMapper = new MapperConfiguration(
+                mc => mc.AddProfile(new MappingProfile()))
+                .CreateMapper()
+                .ConfigurationProvider;
 
-            adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(petId);
+            var adoptionService = new AdoptionService(notificationService.Object, autoMapper, db);
+
+            await adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(petId);
 
             firstApplication.RequestStatus.Should().Be(Declined);
             secondApplication.RequestStatus.Should().Be(Declined);

@@ -1,5 +1,6 @@
 ﻿namespace AdoptMe.Services.Shelters
 {
+    using System.Threading.Tasks;
     using AdoptMe.Data.Models;
 
     public interface IShelterService
@@ -10,7 +11,7 @@
 
         public int IdByUser(string userId);
 
-        public string GetShelterUserIdByPet(int id);
+        Task<string> GetShelterUserIdByPet(int id);
 
         public Shelter GetShelterById(int id);
     }

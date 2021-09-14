@@ -1,31 +1,32 @@
 ﻿namespace AdoptMe.Services.Adoptions
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Adoptions;
 
     public interface IAdoptionService
     {
-        int CreateAdoption(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int id, string userId);
+        Task<int> CreateAdoption(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int id, string userId);
 
-        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex, string userId);
+        Task<AdoptionApplicationsViewModel> AdoptionApplications(int pageIndex, string userId);
 
-        public AdoptionDetailsViewModel Details(int id);
+        Task<AdoptionDetailsViewModel> Details(int id);
 
-        public void ApproveAdoption(int id);
+        Task ApproveAdoption(int id);
 
-        public void DeclineAdoption(int id);
+        Task DeclineAdoption(int id);
 
-        public bool SentApplication(int id, string userId);
+        Task<bool> SentApplication(int id, string userId);
 
-        public AdoptionApplication GetAdoption(int id);
+        Task<AdoptionApplication> GetAdoption(int id);
 
-        public IEnumerable<AdoptionApplication> SubmittedPetAdoptionApplications(int id);
+        Task<IEnumerable<AdoptionApplication>> SubmittedPetAdoptionApplications(int id);
 
-        public void DeclineAdoptionWhenPetIsDeletedOrAdopted(int petId);
+        Task DeclineAdoptionWhenPetIsDeletedOrAdopted(int petId);
 
-        public Adopter GetAdopterByAdoptionId(int id);
+        Task<Adopter> GetAdopterByAdoptionId(int id);
 
-        public Pet GetPetByAdoptionId(int id);
+        Task<Pet> GetPetByAdoptionId(int id);
     }
 }

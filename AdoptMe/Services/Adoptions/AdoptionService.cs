@@ -3,10 +3,13 @@
     using System;
     using System.Linq;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
+    using AutoMapper;
+    using AutoMapper.QueryableExtensions;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Adoptions;
-    using AdoptMe.Services.Users;
     using AdoptMe.Services.Notifications;
 
     using static Data.Models.Enums.RequestStatus;
@@ -14,21 +17,25 @@
 
     public class AdoptionService : IAdoptionService
     {
-        private readonly INotificationService notificationService;
         private readonly AdoptMeDbContext data;
+        private readonly INotificationService notificationService;
+        private readonly IConfigurationProvider mapper;
 
-        public AdoptionService(INotificationService notificationService, AdoptMeDbContext data)
+        public AdoptionService(INotificationService notificationService, 
+            IConfigurationProvider mapper,
+            AdoptMeDbContext data)
         {
             this.data = data;
             this.notificationService = notificationService;
+            this.mapper = mapper;
         }
 
-        public int CreateAdoption(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int petId, string userId)
+        public async Task<int> CreateAdoption(string firstQuestion, string secondQuestion, string thirdQuestion, string fourthQuestion, int petId, string userId)
         {
-            var adopter = this.data
+            var adopter = await this.data
                     .Adopters
                     .Where(x => x.UserId == userId)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
 
             var adoptionData = new AdoptionApplication
             {
@@ -43,20 +50,20 @@
                 SubmittedOn = DateTime.UtcNow
             };
 
-            this.data.AdoptionApplications.Add(adoptionData);
-            this.data.SaveChanges();
+            await this.data.AdoptionApplications.AddAsync(adoptionData);
+            await this.data.SaveChangesAsync();
 
             return adoptionData.Id;
         }
 
-        public AdoptionApplicationsViewModel AdoptionApplications(int pageIndex, string userId)
+        public async Task<AdoptionApplicationsViewModel> AdoptionApplications(int pageIndex, string userId)
         {
             var adoptionsQuery = this.data
                 .AdoptionApplications
                 .Where(s => s.RequestStatus == Submitted && s.Pet.Shelter.UserId == userId)
                 .AsQueryable();
 
-            var adoptions = adoptionsQuery
+            var adoptions = await adoptionsQuery
                 .Select(x => new AdoptionViewModel
                 {
                     Id = x.Id,
@@ -69,7 +76,7 @@
                 .ThenBy(x => x.SubmittedOn)
                 .Skip((pageIndex - 1) * AdoptionApplicationsPageSize)
                 .Take(AdoptionApplicationsPageSize)
-                .ToList();
+                .ToListAsync();
 
             return new AdoptionApplicationsViewModel
             {
@@ -78,89 +85,76 @@
             };
         }
 
-        public AdoptionDetailsViewModel Details(int id)
-            => this.data
+        public async Task<AdoptionDetailsViewModel> Details(int id)
+            => await this.data
                    .AdoptionApplications
                    .Where(a => a.Id == id)
-                   .Select(a => new AdoptionDetailsViewModel
-                   {
-                       Id = a.Id,
-                       AdopterFullName = a.Adopter.FirstName + " " + a.Adopter.LastName,
-                       AdopterAge = a.Adopter.Age,
-                       PetName = a.Pet.Name,
-                       SubmittedOn = a.SubmittedOn,
-                       FirstAnswer = a.FirstAnswer,
-                       SecondAnswer = a.SecondAnswer,
-                       ThirdAnswer = a.ThirdAnswer,
-                       FourthAnswer = a.FourthAnswer,
-                       PetId = a.PetId
-                   })
-                   .FirstOrDefault();
+                   .ProjectTo<AdoptionDetailsViewModel>(this.mapper)
+                   .FirstOrDefaultAsync();
 
-        public void ApproveAdoption(int id)
+        public async Task ApproveAdoption(int id)
         {
-            var adoptionApplication = GetAdoption(id);
+            var adoptionApplication = await GetAdoption(id);
 
             adoptionApplication.RequestStatus = Аccepted;
 
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
         }
 
-        public void DeclineAdoption(int id)
+        public async Task DeclineAdoption(int id)
         {
-            var adoptionApplication = GetAdoption(id);
+            var adoptionApplication = await GetAdoption(id);
 
             adoptionApplication.RequestStatus = Declined;
 
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
         }
 
-        public void DeclineAdoptionWhenPetIsDeletedOrAdopted(int petId)
+        public async Task DeclineAdoptionWhenPetIsDeletedOrAdopted(int petId)
         {
-            var petAdoptionApplications = this.SubmittedPetAdoptionApplications(petId);
+            var petAdoptionApplications = await this.SubmittedPetAdoptionApplications(petId);
 
             if (petAdoptionApplications.Any())
             {
                 foreach (var application in petAdoptionApplications)
                 {
-                    var adopter = this.GetAdopterByAdoptionId(application.Id);
+                    var adopter = await this.GetAdopterByAdoptionId(application.Id);
 
                     application.RequestStatus = Declined;
-                    notificationService.DeclineAdoptionNotification(application.Pet.Name,
-                                                                    adopter.UserId);
+                    await notificationService.DeclineAdoptionNotification(application.Pet.Name, adopter.UserId);
 
-                    this.data.SaveChanges();
+                    await this.data.SaveChangesAsync();
                 }
             }
         }
 
-        public bool SentApplication(int id, string userId)
-            => this.data
+        public async Task<bool> SentApplication(int id, string userId)
+            => await this.data
                 .AdoptionApplications
-                .Any(x => x.Adopter.UserId == userId
+                .AnyAsync(x => x.Adopter.UserId == userId
                           && x.PetId == id
                           && x.RequestStatus == Submitted);
 
-        public AdoptionApplication GetAdoption(int id)
-            => this.data
+        public async Task<AdoptionApplication> GetAdoption(int id)
+            => await this.data
                     .AdoptionApplications
                     .Where(x => x.Id == id)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
 
-        public IEnumerable<AdoptionApplication> SubmittedPetAdoptionApplications(int petId)
-            => this.data
+        public async Task<IEnumerable<AdoptionApplication>> SubmittedPetAdoptionApplications(int petId)
+            => await this.data
                 .AdoptionApplications
                 .Where(x => x.PetId == petId && x.RequestStatus == Submitted)
-                .ToList();
+                .ToListAsync();
 
-        public Adopter GetAdopterByAdoptionId(int id)
-            => this.data
+        public async Task<Adopter> GetAdopterByAdoptionId(int id)
+            => await this.data
                    .Adopters
-                   .FirstOrDefault(x => x.AdoptionApplications.Any(x => x.Id == id));
+                   .FirstOrDefaultAsync(x => x.AdoptionApplications.Any(x => x.Id == id));
 
-        public Pet GetPetByAdoptionId(int id)
-            => this.data
+        public async Task<Pet> GetPetByAdoptionId(int id)
+            => await this.data
                    .Pets
-                   .FirstOrDefault(x => x.AdoptionApplications.Any(x => x.Id == id));
+                   .FirstOrDefaultAsync(x => x.AdoptionApplications.Any(x => x.Id == id));
     }
 }

@@ -1,31 +1,32 @@
 ﻿namespace AdoptMe.Services.Notifications
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Notifications;
 
     public interface INotificationService
     {
-        IEnumerable<NotificationViewModel> GetUserNotifications(string userId);
+        Task<IEnumerable<NotificationViewModel>> GetUserNotifications(string userId);
 
-        public Notification Create(string message);
+        Task<Notification> Create(string message);
 
-        void ReadNotification(int notificationId, string userId);
+        Task ReadNotification(int notificationId, string userId);
 
-        bool AddNotificationToUser(int notificationId, string userId);
+        Task<bool> AddNotificationToUser(int notificationId, string userId);
 
-        public void PetEditByAdminNotification(string petName, string userId);
+        Task PetEditByAdminNotification(string petName, string userId);
 
-        public void PetDeletedByAdminNotification(string petName, string userId);
+        Task PetDeletedByAdminNotification(string petName, string userId);
 
-        public void ApproveAdoptionNotification(string petName, string userId);
+        Task ApproveAdoptionNotification(string petName, string userId);
 
-        public void DeclineAdoptionNotification(string petName, string userId);
+        Task DeclineAdoptionNotification(string petName, string userId);
 
-        public void SentAdoptionNotification(string petName, string userId);
+        Task SentAdoptionNotification(string petName, string userId);
 
-        public void AcceptShelterRegistrationNotification(string shelterName, string shelterUserId);
+        Task AcceptShelterRegistrationNotification(string shelterName, string shelterUserId);
 
-        public void DeclineShelterRegistrationNotification(string shelterName, string shelterUserId);
+        Task DeclineShelterRegistrationNotification(string shelterName, string shelterUserId);
     }
 }

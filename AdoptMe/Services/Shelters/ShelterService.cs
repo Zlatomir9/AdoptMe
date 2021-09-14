@@ -1,6 +1,8 @@
 ﻿namespace AdoptMe.Services.Shelters
 {
     using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using AdoptMe.Data;
     using AdoptMe.Data.Models;
     using AdoptMe.Data.Models.Enums;
@@ -81,12 +83,12 @@
                    .Shelters
                    .Any(s => s.UserId == userId && s.RegistrationStatus == RequestStatus.Submitted);
 
-        public string GetShelterUserIdByPet(int id)
-            => this.data
+        public async Task<string> GetShelterUserIdByPet(int id)
+            => await this.data
                    .Pets
                    .Where(x => x.Id == id)
                    .Select(x => x.Shelter.UserId)
-                   .FirstOrDefault();
+                   .FirstOrDefaultAsync();
 
         public Shelter GetShelterById(int id)
             => this.data

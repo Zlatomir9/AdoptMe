@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using System.Threading.Tasks;
     using Xunit;
     using Microsoft.EntityFrameworkCore;
     using FluentAssertions;
@@ -13,7 +14,7 @@
     {
         [Theory]
         [InlineData("message")]
-        public void CreateShouldAddNotificationInDatabase(string message)
+        public async Task CreateShouldAddNotificationInDatabase(string message)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -25,9 +26,9 @@
 
             var notificationService = new NotificationService(db);
 
-            var notification = notificationService.Create(message);
+            var notification = await notificationService.Create(message);
 
-            var actualNotification = db.Notifications.FirstOrDefault();
+            var actualNotification = await db.Notifications.FirstOrDefaultAsync();
 
             notification.Should().BeEquivalentTo(actualNotification);
             db.Notifications.Should().HaveCount(1);
@@ -36,7 +37,7 @@
         [Theory]
         [InlineData(1, "userId")]
         [InlineData(2, "secondId")]
-        public void AddNotificationToUserShoulReturnTrue(int notificationId, string userId)
+        public async Task AddNotificationToUserShoulReturnTrue(int notificationId, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -48,7 +49,7 @@
 
             var notificationService = new NotificationService(db);
 
-            var userNotification = notificationService.AddNotificationToUser(notificationId, userId);
+            var userNotification = await notificationService.AddNotificationToUser(notificationId, userId);
 
             userNotification.Should().BeTrue();
             db.UserNotifications.Should().HaveCount(1);
@@ -57,7 +58,7 @@
         [Theory]
         [InlineData("userId", 1)]
         [InlineData("secondId", 3)]
-        public void ReadNotificationShoulSetIsReadToTrue(string userId, int notificationId)
+        public async Task ReadNotificationShoulSetIsReadToTrue(string userId, int notificationId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -81,18 +82,18 @@
                 IsRead = false
             };
 
-            db.Notifications.Add(notification);
-            db.UserNotifications.Add(userNotification);
-            db.SaveChanges();
+            await db.Notifications.AddAsync(notification);
+            await db.UserNotifications.AddAsync(userNotification);
+            await db.SaveChangesAsync();
 
-            notificationService.ReadNotification(notificationId, userId);
+            await notificationService.ReadNotification(notificationId, userId);
 
             userNotification.IsRead.Should().BeTrue();
         }
 
         [Theory]
         [InlineData("petName", "userId")]
-        public void PetEditByAdminNotificationShoulAddNotification(string petName, string userId)
+        public async Task PetEditByAdminNotificationShoulAddNotification(string petName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -104,7 +105,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.PetEditByAdminNotification(petName, userId);
+            await notificationService.PetEditByAdminNotification(petName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);
@@ -112,7 +113,7 @@
 
         [Theory]
         [InlineData("petName", "userId")]
-        public void PetDeleteByAdminNotificationShoulAddNotification(string petName, string userId)
+        public async Task PetDeleteByAdminNotificationShoulAddNotification(string petName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -124,7 +125,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.PetDeletedByAdminNotification(petName, userId);
+            await notificationService.PetDeletedByAdminNotification(petName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);
@@ -132,7 +133,7 @@
 
         [Theory]
         [InlineData("petName", "userId")]
-        public void ApproveAdoptionNotificationShoulAddNotification(string petName, string userId)
+        public async Task ApproveAdoptionNotificationShoulAddNotification(string petName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -144,7 +145,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.ApproveAdoptionNotification(petName, userId);
+            await notificationService.ApproveAdoptionNotification(petName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);
@@ -152,7 +153,7 @@
 
         [Theory]
         [InlineData("petName", "userId")]
-        public void DeclineAdoptionNotificationShoulAddNotification(string petName, string userId)
+        public async Task DeclineAdoptionNotificationShoulAddNotification(string petName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -164,7 +165,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.DeclineAdoptionNotification(petName, userId);
+            await notificationService.DeclineAdoptionNotification(petName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);
@@ -172,7 +173,7 @@
 
         [Theory]
         [InlineData("petName", "userId")]
-        public void SentAdoptionNotificationShoulAddNotification(string petName, string userId)
+        public async Task SentAdoptionNotificationShoulAddNotification(string petName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -184,7 +185,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.SentAdoptionNotification(petName, userId);
+            await notificationService.SentAdoptionNotification(petName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);
@@ -192,7 +193,7 @@
 
         [Theory]
         [InlineData("shelterName", "userId")]
-        public void AcceptShelterRegistrationNotificationShoulAddNotification(string shelterName, string userId)
+        public async Task AcceptShelterRegistrationNotificationShoulAddNotification(string shelterName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -204,7 +205,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.AcceptShelterRegistrationNotification(shelterName, userId);
+            await notificationService.AcceptShelterRegistrationNotification(shelterName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);
@@ -212,7 +213,7 @@
 
         [Theory]
         [InlineData("shelterName", "userId")]
-        public void DeclineShelterRegistrationNotificationShoulAddNotification(string shelterName, string userId)
+        public async Task DeclineShelterRegistrationNotificationShoulAddNotification(string shelterName, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -224,7 +225,7 @@
 
             var notificationService = new NotificationService(db);
 
-            notificationService.DeclineShelterRegistrationNotification(shelterName, userId);
+            await notificationService.DeclineShelterRegistrationNotification(shelterName, userId);
 
             db.UserNotifications.Should().HaveCount(1);
             db.UserNotifications.Should().Contain(x => x.UserId == userId);

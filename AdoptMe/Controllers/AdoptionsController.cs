@@ -1,8 +1,8 @@
 ﻿namespace AdoptMe.Controllers
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
-    using System.Threading.Tasks;
     using AdoptMe.Models.Pets;
     using AdoptMe.Infrastructure;
     using AdoptMe.Services.Adoptions;
@@ -36,7 +36,7 @@
         }
 
         [Authorize(Roles = AdopterRoleName)]
-        public IActionResult AdoptionApplication(int id)
+        public async Task<IActionResult> AdoptionApplication(int id)
         {
             var userId = this.User.GetId();
 
@@ -45,7 +45,7 @@
                 return BadRequest();
             }
 
-            if (adoptionService.SentApplication(id, userId))
+            if (await adoptionService.SentApplication(id, userId))
             {
                 return BadRequest();
             }
@@ -64,7 +64,7 @@
 
             var userId = this.User.GetId();
 
-            this.adoptionService.CreateAdoption(
+            await this.adoptionService.CreateAdoption(
                 adoption.FirstQuestion,
                 adoption.SecondQuestion,
                 adoption.ThirdQuestion,
@@ -73,19 +73,19 @@
                 userId);
 
             var pet = await this.petService.GetPetById(id);
-            var shelterUserId = this.shelterService.GetShelterUserIdByPet(id);
+            var shelterUserId = await this.shelterService.GetShelterUserIdByPet(id);
 
-            this.notificationService.SentAdoptionNotification(pet.Name, shelterUserId);
+            await this.notificationService.SentAdoptionNotification(pet.Name, shelterUserId);
 
             return RedirectToAction("All", "Pets");
         }
 
         [Authorize]
-        public IActionResult AdoptionRequests(AdoptionApplicationsViewModel query)
+        public async Task<IActionResult> AdoptionRequests(AdoptionApplicationsViewModel query)
         {
             var userId = this.User.GetId();
 
-            var queryResult = this.adoptionService.AdoptionApplications(
+            var queryResult = await this.adoptionService.AdoptionApplications(
                 query.PageIndex, userId);
 
             query.TotalAdoptionApplications = queryResult.TotalAdoptionApplications;
@@ -97,7 +97,7 @@
         [Authorize]
         public async Task<IActionResult> AdoptionApplicationDetails(AdoptionDetailsViewModel model)
         {
-            var modelResult = this.adoptionService.Details(model.Id);
+            var modelResult = await this.adoptionService.Details(model.Id);
 
             if (!await this.petService.AddedByShelter(modelResult.PetId, User.GetId()))
             {
@@ -116,33 +116,33 @@
                 return this.NotFound();
             }
 
-            this.adoptionService.ApproveAdoption(id);
+            await this.adoptionService.ApproveAdoption(id);
 
-            var pet = this.adoptionService.GetPetByAdoptionId(id);
-            var adopter = this.adoptionService.GetAdopterByAdoptionId(id);
+            var pet = await this.adoptionService.GetPetByAdoptionId(id);
+            var adopter = await this.adoptionService.GetAdopterByAdoptionId(id);
 
             await this.petService.IsAdopted(pet.Id);
-            this.notificationService.ApproveAdoptionNotification(pet.Name, adopter.UserId);
-            this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(pet.Id);
+            await this.notificationService.ApproveAdoptionNotification(pet.Name, adopter.UserId);
+            await this.adoptionService.DeclineAdoptionWhenPetIsDeletedOrAdopted(pet.Id);
 
             return this.RedirectToAction(nameof(AdoptionRequests));
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult DeclineAdoption(int id)
+        public async Task<IActionResult> DeclineAdoption(int id)
         {
             if (id == 0)
             {
                 return this.NotFound();
             }
 
-            this.adoptionService.DeclineAdoption(id);
+            await this.adoptionService.DeclineAdoption(id);
 
-            var pet = this.adoptionService.GetPetByAdoptionId(id);
-            var adopter = this.adoptionService.GetAdopterByAdoptionId(id);
+            var pet = await this.adoptionService.GetPetByAdoptionId(id);
+            var adopter = await this.adoptionService.GetAdopterByAdoptionId(id);
 
-            this.notificationService.DeclineAdoptionNotification(pet.Name, adopter.UserId);
+            await this.notificationService.DeclineAdoptionNotification(pet.Name, adopter.UserId);
 
             return this.RedirectToAction(nameof(AdoptionRequests));
         }

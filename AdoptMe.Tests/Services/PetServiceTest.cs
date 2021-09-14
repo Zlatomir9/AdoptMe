@@ -160,11 +160,6 @@
 
             var db = new AdoptMeDbContext(options);
 
-            var mappingConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(new MappingProfile());
-            });
-
             var autoMapper = new MapperConfiguration(
                 mc => mc.AddProfile(new MappingProfile()))
                 .CreateMapper()

@@ -1,16 +1,17 @@
 ﻿namespace AdoptMe.Tests.Services
 {
     using System;
-    using Xunit;
     using System.Linq;
+    using System.Threading.Tasks;
+    using System.Collections.Generic;
     using Microsoft.EntityFrameworkCore;
+    using Xunit;
     using FluentAssertions;
     using AdoptMe.Data;
     using AdoptMe.Services.Shelters;
     using AdoptMe.Data.Models;
 
     using static Data.Models.Enums.RequestStatus;
-    using System.Collections.Generic;
 
     public class ShelterServiceTest
     {
@@ -124,7 +125,7 @@
         [Theory]
         [InlineData(1, "shelterId")]
         [InlineData(100, "id")]
-        public void GetShelterUserIdByPetShouldReturnWorkCorrectly(int petId, string userId)
+        public async Task GetShelterUserIdByPetShouldReturnWorkCorrectly(int petId, string userId)
         {
             var guid = Guid.NewGuid().ToString();
 
@@ -145,13 +146,13 @@
                 Pets = new List<Pet>() { pet }
             };
 
-            db.Pets.Add(pet);
-            db.Shelters.Add(shelter);
+            await db.Pets.AddAsync(pet);
+            await db.Shelters.AddAsync(shelter);
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
 
             var shelterService = new ShelterService(db);
-            var result = shelterService.GetShelterUserIdByPet(petId);
+            var result = await shelterService.GetShelterUserIdByPet(petId);
 
             result.Should().Be(userId);
         }

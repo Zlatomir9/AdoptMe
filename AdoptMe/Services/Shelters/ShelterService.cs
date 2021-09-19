@@ -90,11 +90,11 @@
                    .Select(x => x.Shelter.UserId)
                    .FirstOrDefaultAsync();
 
-        public Shelter GetShelterById(int id)
-            => this.data
+        public async Task<Shelter> GetShelterById(int id)
+            => await this.data
                    .Shelters
                    .Where(x => x.Id == id)
-                   .FirstOrDefault();
+                   .FirstOrDefaultAsync();
                    
     }
 }

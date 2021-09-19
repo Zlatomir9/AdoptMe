@@ -3,17 +3,18 @@
     using AdoptMe.Data.Models;
     using AdoptMe.Models.Pets;
     using AdoptMe.Models.Shelters;
+    using System.Threading.Tasks;
 
     public interface IAdministrationService
     {
-        RegistrationRequestsViewModel RegistrationRequests(int pageIndex);
+        Task<RegistrationRequestsViewModel> RegistrationRequests(int pageIndex);
 
-        AllPetsViewModel AllPets(int pageIndex, string sortOrder);
+        Task<AllPetsViewModel> AllPets(int pageIndex, string sortOrder);
 
-        public void AcceptRequest(int id);
+        Task AcceptRequest(int id);
 
-        public void DeclineRequest(int id);
+        Task DeclineRequest(int id);
 
-        public Shelter GetShelterById(int id);
+        Task<Shelter> GetShelterById(int id);
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace AdoptMe.Areas.Administration.Controllers
 {
     using System;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using AdoptMe.Services.Administration;
     using AdoptMe.Models.Pets;
@@ -25,9 +26,9 @@
 
         public IActionResult Index() => View();
 
-        public IActionResult RegistrationRequests(RegistrationRequestsViewModel query)
+        public async Task<IActionResult> RegistrationRequests(RegistrationRequestsViewModel query)
         {
-            var queryResult = this.administration.RegistrationRequests(
+            var queryResult = await this.administration.RegistrationRequests(
                 query.PageIndex);
 
             query.TotalShelters = queryResult.TotalShelters;
@@ -37,46 +38,46 @@
         }
 
         [HttpPost]
-        public IActionResult АcceptRequest(int id)
+        public async Task<IActionResult> АcceptRequest(int id)
         {
             if (id == 0)
             {
                 return this.NotFound();
             }
 
-            this.administration.AcceptRequest(id);
+            await this.administration.AcceptRequest(id);
 
-            var shelter = this.shelterService.GetShelterById(id);
+            var shelter = await this.shelterService.GetShelterById(id);
 
-            this.notificationService.AcceptShelterRegistrationNotification(shelter.Name, shelter.UserId);
+            await this.notificationService.AcceptShelterRegistrationNotification(shelter.Name, shelter.UserId);
 
             return this.RedirectToAction(nameof(RegistrationRequests));
         }
 
         [HttpPost]
-        public IActionResult DeclineRequest(int id)
+        public async Task<IActionResult> DeclineRequest(int id)
         {
             if (id == 0)
             {
                 return this.NotFound();
             }
 
-            var shelter = this.shelterService.GetShelterById(id);
+            var shelter = await this.shelterService.GetShelterById(id);
 
-            this.notificationService.DeclineShelterRegistrationNotification(shelter.Name, shelter.UserId);
+            await this.notificationService.DeclineShelterRegistrationNotification(shelter.Name, shelter.UserId);
 
-            this.administration.DeclineRequest(id);
+            await this.administration.DeclineRequest(id);
 
             return this.RedirectToAction(nameof(RegistrationRequests));
         }
 
-        public IActionResult AllPets(AllPetsViewModel query, string sortOrder)
+        public async Task<IActionResult> AllPets(AllPetsViewModel query, string sortOrder)
         {
             ViewBag.DateSortParm = String.IsNullOrEmpty(sortOrder) ? "Date" : "";
             ViewBag.ShelterSortParm = sortOrder == "Shelter" ? "shelter_desc" : "Shelter";
             ViewBag.CurrentSort = sortOrder;
 
-            var queryResult = this.administration.AllPets(
+            var queryResult = await this.administration.AllPets(
                 query.PageIndex, 
                 query.SortOrder);
 

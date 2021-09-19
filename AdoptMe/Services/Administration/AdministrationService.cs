@@ -2,6 +2,8 @@
 {
     using System.Linq;
     using AdoptMe.Data;
+    using System.Threading.Tasks;
+    using Microsoft.EntityFrameworkCore;
     using AdoptMe.Models.Shelters;
     using AdoptMe.Data.Models.Enums;
     using AdoptMe.Data.Models;
@@ -27,14 +29,14 @@
             this.userService = userService;
         }
 
-        public RegistrationRequestsViewModel RegistrationRequests(int pageIndex)
+        public async Task<RegistrationRequestsViewModel> RegistrationRequests(int pageIndex)
         {
             var sheltersQuery = this.data
                 .Shelters
                 .Where(s => s.RegistrationStatus == RequestStatus.Submitted)
                 .AsQueryable();
 
-            var shelters = sheltersQuery
+            var shelters = await sheltersQuery
                 .Select(x => new ShelterDetailsViewModel
                 {
                     Id = x.Id,
@@ -56,7 +58,7 @@
                 })
                 .Skip((pageIndex - 1) * AdminPanelPagesSize)
                 .Take(AdminPanelPagesSize)
-                .ToList();
+                .ToListAsync();
 
             return new RegistrationRequestsViewModel
             {
@@ -65,7 +67,7 @@
             };
         }
 
-        public AllPetsViewModel AllPets(int pageIndex, string sortOrder)
+        public async Task<AllPetsViewModel> AllPets(int pageIndex, string sortOrder)
         {
             var petsQuery = this.data.Pets.AsQueryable();
 
@@ -77,7 +79,7 @@
                 _ => petsQuery.OrderByDescending(p => p.DateAdded),
             };
 
-            var pets = petsQuery
+            var pets = await petsQuery
                 .Select(x => new PetDetailsViewModel
                 {
                     Id = x.Id,
@@ -92,7 +94,7 @@
                 })
                 .Skip((pageIndex - 1) * AdminPanelPagesSize)
                 .Take(AdminPanelPagesSize)
-                .ToList();
+                .ToListAsync();
 
             return new AllPetsViewModel
             {
@@ -101,27 +103,27 @@
             };
         }
 
-        public void AcceptRequest(int id)
+        public async Task AcceptRequest(int id)
         {
-            var shelter = this.GetShelterById(id);
+            var shelter = await this.GetShelterById(id);
             shelter.RegistrationStatus = RequestStatus.Аccepted;
             this.userService.AddUserToRole(shelter.UserId, ShelterRoleName);
 
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
         }
 
-        public void DeclineRequest(int id)
+        public async Task DeclineRequest(int id)
         {
-            var shelter = this.GetShelterById(id);
+            var shelter = await this.GetShelterById(id);
 
             this.data.Shelters.Remove(shelter);
-            this.data.SaveChanges();
+            await this.data.SaveChangesAsync();
         }
 
-        public Shelter GetShelterById(int id)
-            => this.data
+        public async Task<Shelter> GetShelterById(int id)
+            => await this.data
                 .Shelters
                 .Where(s => s.Id == id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
     }
 }

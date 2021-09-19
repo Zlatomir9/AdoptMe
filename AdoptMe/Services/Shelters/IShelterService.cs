@@ -13,6 +13,6 @@
 
         Task<string> GetShelterUserIdByPet(int id);
 
-        public Shelter GetShelterById(int id);
+        Task<Shelter> GetShelterById(int id);
     }
 }

@@ -17,7 +17,7 @@
 
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder PrepareDatabase(
+        public static async Task<IApplicationBuilder> PrepareDatabase(
             this IApplicationBuilder app)
         {
             using var scopedServices = app.ApplicationServices.CreateScope();
@@ -28,16 +28,16 @@
             data.Database.Migrate();
 
             SeedCategories(data);
-            SeedRoles(services);
-            SeedAdministrator(services);
-            SeedUser(services, ShelterSeeder.Username, ShelterSeeder.Email);
-            SeedUser(services, AdopterSeeder.Username, AdopterSeeder.Email);
-            SeedUser(services, AdopterSeeder.Username2, AdopterSeeder.Email2);
-            SeedAddress(services, AddressSeeder.CityName, AddressSeeder.StreetName, AddressSeeder.StreetNumber);
-            SeedShelter(services, ShelterSeeder.Username);
-            SeedAdopter(services, AdopterSeeder.Username, AdopterSeeder.FirstName, AdopterSeeder.LastName, AdopterSeeder.Age);
-            SeedAdopter(services, AdopterSeeder.Username2, AdopterSeeder.FirstName2, AdopterSeeder.LastName2, AdopterSeeder.Age2);
-            SeedPets(services);
+            await SeedRoles(services);
+            await SeedAdministrator(services);
+            await SeedUser(services, ShelterSeeder.Username, ShelterSeeder.Email);
+            await SeedUser(services, AdopterSeeder.Username, AdopterSeeder.Email);
+            await SeedUser(services, AdopterSeeder.Username2, AdopterSeeder.Email2);
+            await SeedAddress(services, AddressSeeder.CityName, AddressSeeder.StreetName, AddressSeeder.StreetNumber);
+            await SeedShelter(services, ShelterSeeder.Username);
+            await SeedAdopter(services, AdopterSeeder.Username, AdopterSeeder.FirstName, AdopterSeeder.LastName, AdopterSeeder.Age);
+            await SeedAdopter(services, AdopterSeeder.Username2, AdopterSeeder.FirstName2, AdopterSeeder.LastName2, AdopterSeeder.Age2);
+            await SeedPets(services);
 
             return app;
         }
@@ -59,33 +59,27 @@
             data.SaveChanges();
         }
 
-        private static void SeedRoles(IServiceProvider services)
+        private static async Task SeedRoles(IServiceProvider services)
         {
             var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
 
-            Task
-                .Run(async () =>
-                {
-                    if ((await roleManager.RoleExistsAsync(AdminRoleName))
-                        && (await roleManager.RoleExistsAsync(ShelterRoleName))
-                        && (await roleManager.RoleExistsAsync(AdopterRoleName)))
-                    {
-                        return;
-                    }
+            if ((await roleManager.RoleExistsAsync(AdminRoleName))
+                && (await roleManager.RoleExistsAsync(ShelterRoleName))
+                && (await roleManager.RoleExistsAsync(AdopterRoleName)))
+            {
+                return;
+            }
 
-                    var adminRole = new IdentityRole { Name = AdminRoleName };
-                    var shelterRole = new IdentityRole { Name = ShelterRoleName };
-                    var adopetrRole = new IdentityRole { Name = AdopterRoleName };
+            var adminRole = new IdentityRole { Name = AdminRoleName };
+            var shelterRole = new IdentityRole { Name = ShelterRoleName };
+            var adopetrRole = new IdentityRole { Name = AdopterRoleName };
 
-                    await roleManager.CreateAsync(adminRole);
-                    await roleManager.CreateAsync(shelterRole);
-                    await roleManager.CreateAsync(adopetrRole);
-                })
-                .GetAwaiter()
-                .GetResult();
+            await roleManager.CreateAsync(adminRole);
+            await roleManager.CreateAsync(shelterRole);
+            await roleManager.CreateAsync(adopetrRole);
         }
 
-        private static void SeedAdministrator(IServiceProvider services)
+        private static async Task SeedAdministrator(IServiceProvider services)
         {
             var userManager = services.GetRequiredService<UserManager<User>>();
 
@@ -94,24 +88,18 @@
                 return;
             }
 
-            Task
-                .Run(async () =>
-                {
-                    var user = new User
-                    {
-                        Email = AdminEmail,
-                        UserName = AdminUsername
-                    };
+            var user = new User
+            {
+                Email = AdminEmail,
+                UserName = AdminUsername
+            };
 
-                    await userManager.CreateAsync(user, AdminPassword);
+            await userManager.CreateAsync(user, AdminPassword);
 
-                    await userManager.AddToRoleAsync(user, AdminRoleName);
-                })
-                .GetAwaiter()
-                .GetResult();
+            await userManager.AddToRoleAsync(user, AdminRoleName);
         }
 
-        private static void SeedUser(IServiceProvider services, string userName, string email)
+        private static async Task SeedUser(IServiceProvider services, string userName, string email)
         {
             var userManager = services.GetRequiredService<UserManager<User>>();
 
@@ -120,37 +108,31 @@
                 return;
             }
 
-            Task
-                .Run(async () =>
-                {
-                    var user = new User
-                    {
-                        UserName = userName,
-                        Email = email
-                    };
+            var user = new User
+            {
+                UserName = userName,
+                Email = email
+            };
 
-                    await userManager.CreateAsync(user, "123456");
+            await userManager.CreateAsync(user, "123456");
 
-                    if (userName == AdopterSeeder.Username || userName == AdopterSeeder.Username2)
-                    {
-                        await userManager.AddToRoleAsync(user, AdopterRoleName);
-                    }
-                    else if (userName == ShelterSeeder.Username)
-                    {
-                        await userManager.AddToRoleAsync(user, ShelterRoleName);
-                    }
-                })
-                .GetAwaiter()
-                .GetResult();
+            if (userName == AdopterSeeder.Username || userName == AdopterSeeder.Username2)
+            {
+                await userManager.AddToRoleAsync(user, AdopterRoleName);
+            }
+            else if (userName == ShelterSeeder.Username)
+            {
+                await userManager.AddToRoleAsync(user, ShelterRoleName);
+            }
         }
 
-        private static void SeedShelter(IServiceProvider services, string userName)
+        private static async Task SeedShelter(IServiceProvider services, string userName)
         {
             var userManager = services.GetRequiredService<UserManager<User>>();
             var db = services.GetRequiredService<AdoptMeDbContext>();
 
-            var user = db.Users.FirstOrDefault(x => x.UserName == userName);
-            var currShelter = db.Shelters.FirstOrDefault(x => x.UserId == user.Id);
+            var user = await db.Users.FirstOrDefaultAsync(x => x.UserName == userName);
+            var currShelter = await db.Shelters.FirstOrDefaultAsync(x => x.UserId == user.Id);
 
             if (user != null && currShelter == null)
             {
@@ -164,16 +146,16 @@
                     AddressId = 1
                 };
 
-                db.Shelters.Add(shelter);
-                db.SaveChanges();
+                await db.Shelters.AddAsync(shelter);
+                await db.SaveChangesAsync();
             }
 
         }
 
-        private static void SeedAddress(IServiceProvider services, string cityName, string streetName, string streetNumber)
+        private static async Task SeedAddress(IServiceProvider services, string cityName, string streetName, string streetNumber)
         {
             var db = services.GetRequiredService<AdoptMeDbContext>();
-            var currenctCity = db.Cities.FirstOrDefault(c => c.Name == cityName);
+            var currenctCity = await db.Cities.FirstOrDefaultAsync(c => c.Name == cityName);
 
             if (currenctCity == null)
             {
@@ -183,8 +165,8 @@
                     Addresses = new List<Address>()
                 };
 
-                db.Cities.Add(city);
-                db.SaveChanges();
+                await db.Cities.AddAsync(city);
+                await db.SaveChangesAsync();
 
                 var address = new Address
                 {
@@ -193,12 +175,12 @@
                     StreetNumber = streetNumber
                 };
 
-                db.Addresses.Add(address);
-                db.SaveChanges();
+                await db.Addresses.AddAsync(address);
+                await db.SaveChangesAsync();
             }
             else
             {
-                var address = db.Addresses.FirstOrDefault(a => a.StreetName == streetName
+                var address = await db.Addresses.FirstOrDefaultAsync(a => a.StreetName == streetName
                                                             && a.StreetNumber == streetNumber
                                                             && a.CityId == currenctCity.Id);
 
@@ -214,42 +196,35 @@
             }
         }
 
-        private static void SeedAdopter(IServiceProvider services, string userName, string firstName, string lastName, int age)
+        private static async Task SeedAdopter(IServiceProvider services, string userName, string firstName, string lastName, int age)
         {
             var userManager = services.GetRequiredService<UserManager<User>>();
             var db = services.GetRequiredService<AdoptMeDbContext>();
 
-            Task
-                .Run(async () =>
+            var user = await userManager.FindByNameAsync(userName);
+            var currAdopter = await db.Adopters.FirstOrDefaultAsync(x => x.UserId == user.Id);
+
+            if (user != null && currAdopter == null)
+            {
+                var adopter = new Adopter
                 {
-                    var user = await userManager.FindByNameAsync(userName);
-                    var currAdopter = db.Adopters.FirstOrDefault(x => x.UserId == user.Id);
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Age = age,
+                    UserId = user.Id
+                };
 
-                    if (user != null && currAdopter == null)
-                    {
-                        var adopter = new Adopter
-                        {
-                            FirstName = firstName,
-                            LastName = lastName,
-                            Age = age,
-                            UserId = user.Id
-                        };
+                await userManager.AddToRoleAsync(user, AdopterRoleName);
 
-                        await userManager.AddToRoleAsync(user, AdopterRoleName);
-
-                        db.Adopters.Add(adopter);
-                        db.SaveChanges();
-                    }
-                })
-                .GetAwaiter()
-                .GetResult();
-
+                await db.Adopters.AddAsync(adopter);
+                await db.SaveChangesAsync();
+            }
         }
 
-        private static void SeedPets(IServiceProvider services)
+        private static async Task SeedPets(IServiceProvider services)
         {
             var db = services.GetRequiredService<AdoptMeDbContext>();
-            var shelter = db.Shelters.FirstOrDefault(x => x.Name == "Pet care");
+            var shelter = await db.Shelters.FirstOrDefaultAsync(x => x.Name == "Pet care");
 
             if (db.Pets.Any())
             {
@@ -318,8 +293,8 @@
                 SpeciesId = 3
             };
 
-            db.Pets.AddRange(pet, pet2, pet3, pet4);
-            db.SaveChanges();
+            await db.Pets.AddRangeAsync(pet, pet2, pet3, pet4);
+            await db.SaveChangesAsync();
         }
     }
 }
